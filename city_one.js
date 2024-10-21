@@ -114,6 +114,9 @@ function loadCube(loader, label, posX, posY, posZ, scaleZ, color) {
         // Add a hoverable label
         addHoverLabel(label, kmz.scene);
 
+        // Add a heatmap-like spot under the building (circular plane)
+        addHeatmapSpot(posX, posY, posZ);
+
         render();  // Render the scene after cube is added
     });
 }
@@ -214,6 +217,62 @@ function createCommunicationLine(start, end, curveHeight, label) {
     // Add the tube to the scene
     scene.add(tube);
 }
+
+function addHeatmapSpot(posX, posY, posZ) {
+    const radius = 1.3;  // Set a constant radius for all heatmap spots
+    const geometry = new THREE.CircleGeometry(radius, 32);  // Create a circular geometry
+
+    // Create a gradient texture based on intensity
+    const gradientTexture = createGradientTexture();
+
+    // Create a material using the gradient texture
+    const material = new THREE.MeshBasicMaterial({
+        map: gradientTexture,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.8,  // Overall opacity of the heatmap spot
+    });
+
+    // Create a mesh (heatmap spot) with the geometry and material
+    const heatmapSpot = new THREE.Mesh(geometry, material);
+
+    heatmapSpot.rotation.x = -Math.PI / 2;  // Rotate to lay flat on the ground
+
+    // Adjust Y to be above the ground plane
+    heatmapSpot.position.set(posX, 0.2, posZ);  // Set Y to 0.2 or higher to clear the ground
+
+    scene.add(heatmapSpot);  // Add the heatmap spot to the scene
+}
+
+
+// Function to create a gradient texture for the heatmap effect
+function createGradientTexture() {
+    const size = 512;  // Define the texture size
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext('2d');
+
+    // Create a radial gradient (from red -> yellow -> green -> blue)
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+
+    // Define color stops (like your example)
+    gradient.addColorStop(0, 'rgba(255, 0, 0, 1)');    // Red (center)
+    gradient.addColorStop(0.3, 'rgba(255, 255, 0, 0.8)');  // Yellow (30% mark)
+    gradient.addColorStop(0.6, 'rgba(0, 255, 0, 0.6)');  // Green (60% mark)
+    gradient.addColorStop(1, 'rgba(0, 0, 255, 0.4)');    // Blue (edge, with transparency for fog effect)
+
+    // Fill the canvas with the gradient
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    // Create a texture from the canvas
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+}
+
+
 
 // Function to handle window resize
 function onWindowResize() {
