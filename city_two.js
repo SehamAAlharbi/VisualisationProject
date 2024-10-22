@@ -18,13 +18,14 @@ function init() {
     light.castShadow = true;  // Enable shadow casting for the light
     scene.add(light);
 
-    // Add ambient light to evenly illuminate the scene
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); // Soft white light
+    // Add ambient light to evenly illuminate the scene, soft white light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); 
     scene.add(ambientLight);
 
     // Camera setup
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 500);
-    camera.position.y = 10;  // Lift the camera higher to see both cubes and ground clearly
+    // Lift the camera higher to see both cubes and ground clearly
+    camera.position.y = 10;  
     camera.position.z = 20;
 
     scene.add(camera);
@@ -34,28 +35,30 @@ function init() {
     scene.add(grid);
 
     // Create grounds (districts) with lables, each is smaller than the other, size is width and depth, position is x,z, left ubovae the ground is y
-    createGround(20, 20, 0xFFFFFF, 0, 0, 0, 'org.jsoup');  //  white ground
-    createGround(10, 10, 0xebe8e8, 0, 0.1, 3, 'nodes');  // grey ground
-    createGround(6, 6, 0xebe8e8, -2, 0.1, -6, 'examples');  // smaller grey ground
+    createGround(20, 20, 0xFFFFFF, 0, 0, 0, 'org.jsoup'); 
+    createGround(10, 10, 0xebe8e8, 0, 0.1, 3, 'nodes'); 
+    createGround(6, 6, 0xebe8e8, -2, 0.1, -6, 'examples');
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;  // Enable shadow map
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;  // Optional, for softer shadows
+    // Enable shadow map
+    renderer.shadowMap.enabled = true;  
+    // Optional, for softer shadows
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
 
     const loader = new KMZLoader();
 
-    // Load cubes (buildings), lable, x, y(lefting), z are for position. scaleZ is for the building's height which sjould be the double of posY
-    loadCube(loader, 'Attribute', -3, 0.5, 0, 1, 1, 1, 0x78A8B8);  // Cube one
-    loadCube(loader, 'Range', 3, 1.5, 3, 3, 3, 3, 0xa7cfcb);  // Cube two
-    loadCube(loader, 'Document', 3, 1, 0.5, 1, 1, 1, 0x63392c);  // Cube three
-    loadCube(loader, 'DataNode', 0, 2, 0, 1, 1, 4, 0xf7b29c);    // Cube four
-    loadCube(loader, 'Node', -1, 1, 3, 2, 2, 2, 0xf5d9c1);   // Cube five
-    loadCube(loader, 'HtmlToPlainText', -3, 0.5, -8, 1, 1, 1, 0xf5d9c1);  // Cube six
-    loadCube(loader, 'ListLinks', 0, 2, -5, 1, 1, 4, 0x63392c);   // Cube seven
+    // Load cubes (buildings), lable, x, y(lefting), z are for position. scaleZ is for the building's height which should be the double of posY
+    loadCube(loader, 'Attribute', -3, 0.5, 0, 1, 1, 1, 0x78A8B8);
+    loadCube(loader, 'Range', 3, 1.5, 3, 3, 3, 3, 0xa7cfcb);
+    loadCube(loader, 'Document', 3, 1, 0.5, 1, 1, 1, 0x63392c);
+    loadCube(loader, 'DataNode', 0, 2, 0, 1, 1, 4, 0xf7b29c);
+    loadCube(loader, 'Node', -1, 1, 3, 2, 2, 2, 0xf5d9c1);
+    loadCube(loader, 'HtmlToPlainText', -3, 0.5, -8, 1, 1, 1, 0xf5d9c1);
+    loadCube(loader, 'ListLinks', 0, 2, -5, 1, 1, 4, 0x63392c);
 
     // Create communication lines between the cubes, start (same building's position, from which), end (to which), height
     createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(0, 2, -5), 16, '[Line No:   ][Usage Type:    ]');
@@ -67,10 +70,12 @@ function init() {
 
     // Setup camera controls (orbit around the scene)
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.addEventListener('change', render);  // Render on change
+    // Render on change
+    controls.addEventListener('change', render);  
     controls.update();
 
-    window.addEventListener('resize', onWindowResize);  // Resize event listener
+    // Resize event listener
+    window.addEventListener('resize', onWindowResize);  
 }
 
 // Function to create a ground (district) and add a label
