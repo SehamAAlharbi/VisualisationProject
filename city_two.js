@@ -31,13 +31,13 @@ function init() {
     scene.add(camera);
 
     // Create a grid helper to show the grid on the ground
-    const grid = new THREE.GridHelper(50, 50, 0xffffff, 0xc3c7c7);
+    const grid = new THREE.GridHelper(150, 150, 0xffffff, 0xc3c7c7);
     scene.add(grid);
 
     // Create grounds (districts) with lables, each is smaller than the other, size is width and depth, position is x,z, left ubovae the ground is y
-    createGround(20, 20, 0xFFFFFF, 0, 0, 0, 'org.jsoup'); 
-    createGround(10, 10, 0xebe8e8, 0, 0.1, 3, 'nodes'); 
-    createGround(6, 6, 0xebe8e8, -2, 0.1, -6, 'examples');
+    createGround(80, 80, 0xFFFFFF, 0, 0, 0, 'org.jsoup'); 
+    createGround(40, 40, 0xebe8e8, -10, 0.1, 15, 'nodes'); 
+    createGround(20, 20, 0xebe8e8, -10, 0.1, -20, 'examples');
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -57,15 +57,15 @@ function init() {
     loadCube(loader, 'Document', 3, 1, 0.5, 1, 1, 1, 0x63392c);
     loadCube(loader, 'DataNode', 0, 2, 0, 1, 1, 4, 0xf7b29c);
     loadCube(loader, 'Node', -1, 1, 3, 2, 2, 2, 0xf5d9c1);
-    loadCube(loader, 'HtmlToPlainText', -3, 0.5, -8, 1, 1, 1, 0xf5d9c1);
-    loadCube(loader, 'ListLinks', 0, 2, -5, 1, 1, 4, 0x63392c);
+    loadCube(loader, 'HtmlToPlainText', -3, 0.5, -15, 1, 1, 1, 0xf5d9c1);
+    loadCube(loader, 'ListLinks', -10, 2, -15, 1, 1, 4, 0x63392c);
 
     // Create communication lines between the cubes, start (same building's position, from which), end (to which), height
-    createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(0, 2, -5), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(3, 1.5, 3), new THREE.Vector3(-3, 0.5, -8), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(3, 1, 0.5), new THREE.Vector3(-3, 0.5, -8), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(0, 2, 0), new THREE.Vector3(0, 2, -5), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(-1, 1, 3), new THREE.Vector3(-3, 0.5, -8), 16, '[Line No:   ][Usage Type:    ]');
+    createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]');
+    createCommunicationLine(new THREE.Vector3(3, 1.5, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]');
+    createCommunicationLine(new THREE.Vector3(3, 1, 0.5), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]');
+    createCommunicationLine(new THREE.Vector3(0, 2, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]');
+    createCommunicationLine(new THREE.Vector3(-1, 1, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]');
 
 
     // Setup camera controls (orbit around the scene)
@@ -97,7 +97,7 @@ function createGround(width, depth, color, x, y, z, labelText) {
     const labelY = y + 0.2;  // Slightly above the ground to avoid clipping
 
 
-    addGroundLabel(labelText, labelX, labelY, labelZ, 0.28);  // Size is proportional to ground size
+    addGroundLabel(labelText, labelX, labelY, labelZ, 0.8);
 }
 
 // Function to load a cube (building) with a hoverable label, pos is where the building is on the grid, scale is the size of the buidng where y is length, x is width, and z is height
@@ -164,7 +164,7 @@ function addHoverLabel(text, scene) {
 }
 
 // Function to add 3D text labels on the ground
-function addGroundLabel(text, positionX, positionY, positionZ, size, rotationX = 0) {
+function addGroundLabel(text, positionX, positionY, positionZ, size) {
     const loader = new FontLoader();
 
     // Load the font
@@ -183,12 +183,13 @@ function addGroundLabel(text, positionX, positionY, positionZ, size, rotationX =
         // Position the text on the ground
         textMesh.position.set(positionX, positionY, positionZ);
 
-        // Rotate the text to lay flat on the ground
-        textMesh.rotation.x = rotationX;
+        // Rotate the text to lay flat on the ground (90 degrees rotation)
+        textMesh.rotation.x = -Math.PI / 2;
 
         scene.add(textMesh);  // Add the text to the scene
     });
 }
+
 
 // Function to create communication lines between cubes
 function createCommunicationLine(start, end, curveHeight, label) {
