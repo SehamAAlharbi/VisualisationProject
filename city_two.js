@@ -36,13 +36,17 @@ function init() {
 
 
     const grounds = [
-        { width: 200, depth: 200, label: 'org.jsoup', isRoot: true, index: 0 },
-        { width: 50, depth: 50, label: 'org.jsoup.nodes', isRoot: true, index: 1 },
-        { width: 50, depth: 50, label: 'org.jsoup.examples', isRoot: true, index: 2 },
-        { width: 5, depth: 5, label: 'org.jsoup.examples.1', isRoot: false, index: 3 },
-        { width: 5, depth: 5, label: 'org.jsoup.examples.2', isRoot: false, index: 4 },
-        { width: 5, depth: 5, label: 'org.jsoup.nodes.3', isRoot: false, index: 5 },
-        { width: 5, depth: 5, label: 'org.jsoup.nodes.4', isRoot: false, index: 6 }
+        { width: 200, depth: 200, label: 'org',  index: 0 },
+        { width: 150, depth: 150, label: 'org.jsoup',  index: 1 },
+        { width: 30, depth: 30, label: 'org.jsoup.nodes', index: 2 },
+        { width: 20, depth: 20, label: 'org.jsoup.nodes.x', index: 2 },
+        { width: 50, depth: 50, label: 'org.jsoup.examples', index: 3 },
+        { width: 20, depth: 20, label: 'org.jsoup.examples.x', index: 3 },
+        { width: 10, depth: 10, label: 'org.jsoup.examples.x.y', index: 3 }
+        // { width: 5, depth: 5, label: 'org.jsoup.examples.1', isRoot: false, index: 3 },
+        // { width: 5, depth: 5, label: 'org.jsoup.examples.2', isRoot: false, index: 4 },
+        // { width: 5, depth: 5, label: 'org.jsoup.nodes.3', isRoot: false, index: 5 },
+        // { width: 5, depth: 5, label: 'org.jsoup.nodes.4', isRoot: false, index: 6 }
     ];
 
     // creating grounds dynamiclly 
@@ -92,48 +96,98 @@ function init() {
     window.addEventListener('resize', onWindowResize);
 }
 
-function createAllGrounds(grounds) {
-    let rootGround = grounds.find(ground => ground.isRoot);
+function getPackageHierarchy(grounds) {
+    const packageHierarchy = {};
 
-    // Position the root ground at (0, 0, 0)
-    let rootWidth = rootGround.width;
-    let rootDepth = rootGround.depth;
-
-    // Create the root ground at the origin
-    createGround(rootWidth, rootDepth, 0xFFFFFF, 0, 0, 0, rootGround.label);
-
-    let yOffset = 0.1;  // Slightly above the root ground
-    let padding = 20;    // Space between grounds to avoid overlap
-
-    // Define initial X and Z for placing non-root grounds
-    let nextX = -rootWidth / 2 + padding; // Start at the left boundary with padding
-    let nextZ = -rootDepth / 2 + padding; // Start near the back boundary with padding
-    let maxRowHeight = 0;  // Keep track of the tallest item in the current row to move to the next row properly
-
-    // Place non-root grounds dynamically on top of the root ground, avoiding overlap
     grounds.forEach(ground => {
-        if (!ground.isRoot) {
-            // Check if the ground would go beyond the root ground's width
-            if (nextX + ground.width + padding > rootWidth / 2) {
-                // Move to the next row
-                nextX = -rootWidth / 2 + padding;
-                nextZ += maxRowHeight + padding;  // Move down by the height of the largest item in the row
-                maxRowHeight = 0;  // Reset for the new row
-            }
+        const parentPackage = ground.label.split('.').slice(0, -1).join('.');
+        if (!packageHierarchy[parentPackage]) {
+            packageHierarchy[parentPackage] = [];
+        }
+        packageHierarchy[parentPackage].push(ground);
+    });
 
-            // Place the non-root ground
-            createGround(ground.width, ground.depth, 0xebe8e8, nextX, yOffset, nextZ, ground.label);
+    return packageHierarchy;
+}
 
-            // Update the max row height if the current ground is taller
-            if (ground.depth > maxRowHeight) {
-                maxRowHeight = ground.depth;
-            }
+function createAllGrounds(grounds) {
+    // Get the hierarchy of packages based on names
+    const packageHierarchy = getPackageHierarchy(grounds);
 
-            // Update the X position for the next ground
-            nextX += ground.width + padding;
+    // Find the root package (the one without any parent)
+    let rootGround = grounds.find(ground => !ground.label.includes('.'));
+    
+    // Create the root package (main package)
+    createGround(rootGround.width, rootGround.depth, 0xFFFFFF, 0, 0, 0, rootGround.label);
+
+    // Start placing the sub-packages
+    placePackages(rootGround, packageHierarchy, 0.1);
+}
+
+function placePackages(parentGround, packageHierarchy, yOffset) {
+    const subPackages = packageHierarchy[parentGround.label] || [];
+    let xOffset = -parentGround.width / 2 + 20; // Initial X offset for sub-packages
+    let zOffset = -parentGround.depth / 2 + 20; // Initial Z offset for sub-packages
+    let rowMaxHeight = 0;
+
+    subPackages.forEach(subGround => {
+        // Always lift sub-packages, even if they have no further children
+        yOffset += 0.1;  // Lift the sub-package above the parent
+
+        createGround(subGround.width, subGround.depth, 0xebe8e8, 0, yOffset, 0, subGround.label);
+
+        // Recursively place child packages if any exist
+        if (packageHierarchy[subGround.label]) {
+            placePackages(subGround, packageHierarchy, yOffset);  // Stack child packages
         }
     });
 }
+
+
+
+
+// function createAllGrounds(grounds) {
+//     let rootGround = grounds.find(ground => ground.isRoot);
+
+//     // Position the root ground at (0, 0, 0)
+//     let rootWidth = rootGround.width;
+//     let rootDepth = rootGround.depth;
+
+//     // Create the root ground at the origin
+//     createGround(rootWidth, rootDepth, 0xFFFFFF, 0, 0, 0, rootGround.label);
+
+//     let yOffset = 0.1;  // Slightly above the root ground
+//     let padding = 20;    // Space between grounds to avoid overlap
+
+//     // Define initial X and Z for placing non-root grounds
+//     let nextX = -rootWidth / 2 + padding; // Start at the left boundary with padding
+//     let nextZ = -rootDepth / 2 + padding; // Start near the back boundary with padding
+//     let maxRowHeight = 0;  // Keep track of the tallest item in the current row to move to the next row properly
+
+//     // Place non-root grounds dynamically on top of the root ground, avoiding overlap
+//     grounds.forEach(ground => {
+//         if (!ground.isRoot) {
+//             // Check if the ground would go beyond the root ground's width
+//             if (nextX + ground.width + padding > rootWidth / 2) {
+//                 // Move to the next row
+//                 nextX = -rootWidth / 2 + padding;
+//                 nextZ += maxRowHeight + padding;  // Move down by the height of the largest item in the row
+//                 maxRowHeight = 0;  // Reset for the new row
+//             }
+
+//             // Place the non-root ground
+//             createGround(ground.width, ground.depth, 0xebe8e8, nextX, yOffset, nextZ, ground.label);
+
+//             // Update the max row height if the current ground is taller
+//             if (ground.depth > maxRowHeight) {
+//                 maxRowHeight = ground.depth;
+//             }
+
+//             // Update the X position for the next ground
+//             nextX += ground.width + padding;
+//         }
+//     });
+// }
 // Function to create a ground (district) and add a label
 function createGround(width, depth, color, x, y, z, labelText) {
     const groundGeometry = new THREE.BoxGeometry(width, 0.15, depth);
