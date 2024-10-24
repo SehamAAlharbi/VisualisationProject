@@ -19,13 +19,13 @@ function init() {
     scene.add(light);
 
     // Add ambient light to evenly illuminate the scene, soft white light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); 
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight);
 
     // Camera setup
     camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 500);
     // Lift the camera higher to see both cubes and ground clearly
-    camera.position.y = 10;  
+    camera.position.y = 10;
     camera.position.z = 20;
 
     scene.add(camera);
@@ -34,17 +34,31 @@ function init() {
     const grid = new THREE.GridHelper(150, 150, 0xffffff, 0xc3c7c7);
     scene.add(grid);
 
+
+    const grounds = [
+        { width: 200, depth: 200, label: 'org.jsoup', isRoot: true, index: 0 },
+        { width: 50, depth: 50, label: 'org.jsoup.nodes', isRoot: true, index: 1 },
+        { width: 50, depth: 50, label: 'org.jsoup.examples', isRoot: true, index: 2 },
+        { width: 5, depth: 5, label: 'org.jsoup.examples.1', isRoot: false, index: 3 },
+        { width: 5, depth: 5, label: 'org.jsoup.examples.2', isRoot: false, index: 4 },
+        { width: 5, depth: 5, label: 'org.jsoup.nodes.3', isRoot: false, index: 5 },
+        { width: 5, depth: 5, label: 'org.jsoup.nodes.4', isRoot: false, index: 6 }
+    ];
+
+    // creating grounds dynamiclly 
+    createAllGrounds(grounds);
+
     // Create grounds (districts) with lables, each is smaller than the other, size is width and depth, position is x,z, left ubovae the ground is y
-    createGround(80, 80, 0xFFFFFF, 0, 0, 0, 'org.jsoup'); 
-    createGround(40, 40, 0xebe8e8, -10, 0.1, 15, 'nodes'); 
-    createGround(20, 20, 0xebe8e8, -10, 0.1, -20, 'examples');
+    // createGround(80, 80, 0xFFFFFF, 0, 0, 0, 'org.jsoup'); 
+    // createGround(40, 40, 0xebe8e8, -10, 0.1, 15, 'nodes'); 
+    // createGround(20, 20, 0xebe8e8, -10, 0.1, -20, 'examples');
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     // Enable shadow map
-    renderer.shadowMap.enabled = true;  
+    renderer.shadowMap.enabled = true;
     // Optional, for softer shadows
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
@@ -71,13 +85,55 @@ function init() {
     // Setup camera controls (orbit around the scene)
     const controls = new OrbitControls(camera, renderer.domElement);
     // Render on change
-    controls.addEventListener('change', render);  
+    controls.addEventListener('change', render);
     controls.update();
 
     // Resize event listener
-    window.addEventListener('resize', onWindowResize);  
+    window.addEventListener('resize', onWindowResize);
 }
 
+function createAllGrounds(grounds) {
+    let rootGround = grounds.find(ground => ground.isRoot);
+
+    // Position the root ground at (0, 0, 0)
+    let rootWidth = rootGround.width;
+    let rootDepth = rootGround.depth;
+
+    // Create the root ground at the origin
+    createGround(rootWidth, rootDepth, 0xFFFFFF, 0, 0, 0, rootGround.label);
+
+    let yOffset = 0.1;  // Slightly above the root ground
+    let padding = 20;    // Space between grounds to avoid overlap
+
+    // Define initial X and Z for placing non-root grounds
+    let nextX = -rootWidth / 2 + padding; // Start at the left boundary with padding
+    let nextZ = -rootDepth / 2 + padding; // Start near the back boundary with padding
+    let maxRowHeight = 0;  // Keep track of the tallest item in the current row to move to the next row properly
+
+    // Place non-root grounds dynamically on top of the root ground, avoiding overlap
+    grounds.forEach(ground => {
+        if (!ground.isRoot) {
+            // Check if the ground would go beyond the root ground's width
+            if (nextX + ground.width + padding > rootWidth / 2) {
+                // Move to the next row
+                nextX = -rootWidth / 2 + padding;
+                nextZ += maxRowHeight + padding;  // Move down by the height of the largest item in the row
+                maxRowHeight = 0;  // Reset for the new row
+            }
+
+            // Place the non-root ground
+            createGround(ground.width, ground.depth, 0xebe8e8, nextX, yOffset, nextZ, ground.label);
+
+            // Update the max row height if the current ground is taller
+            if (ground.depth > maxRowHeight) {
+                maxRowHeight = ground.depth;
+            }
+
+            // Update the X position for the next ground
+            nextX += ground.width + padding;
+        }
+    });
+}
 // Function to create a ground (district) and add a label
 function createGround(width, depth, color, x, y, z, labelText) {
     const groundGeometry = new THREE.BoxGeometry(width, 0.15, depth);
