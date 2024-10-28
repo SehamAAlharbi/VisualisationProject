@@ -38,40 +38,24 @@ function init() {
 
 
     const grounds = [
-        { width: 100, depth: 100, label: 'org', index: 0 },
-        { width: 60, depth: 60, label: 'org.jsoup', index: 1 },
-        { width: 5, depth: 5, label: 'org.jsoup.nodes', index: 2 },
+        { width: 80, depth: 80, label: 'org', index: 0 },
+        { width: 50, depth: 50, label: 'org.jsoup', index: 1 },
+        { width: 30, depth: 30, label: 'org.jsoup.nodes', index: 2 },
         { width: 5, depth: 5, label: 'org.jsoup.select', index: 3 },
-        { width: 5, depth: 5, label: 'org.jsoup.safety', index: 4 },
+        { width: 10, depth: 10, label: 'org.jsoup.safety', index: 4 },
         { width: 5, depth: 5, label: 'org.jsoup.helper', index: 5 }
 
     ];
 
+    // createGround(100, 100, 0xFFFFFF, 0, 10, 0, 'Seham');
 
-    // use with D3.js
+    // Use treemap from D3.js
     const hierarchyData = buildPackageHierarchy(grounds);
     const layoutData = applyTreemapLayout(hierarchyData);
-    // Create grounds in the scene
-    layoutData.children.forEach(child => createGroundFromTreemap(child, 0, 0, 0, scene));
+    centerLayout(layoutData); // Center the layout
 
-
-
-    // creating grounds dynamiclly 
-    // createAllGrounds(grounds);
-
-    // const padding = 4;
-    // const groundSize = 40;
-    // const effectiveSize = 100 - 2 * padding;
-    // const cellSize = effectiveSize / 2; // Size for each "cell" in the grid
-
-    // createGround(100, 100, 0xFFFFFF, 0, 0, 0, 'parent'); // Parent centered at (0, 0, 0)
-
-    // // Positions for each cell with padding accounted for
-    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - cellSize / 2, 'child1'); // Top-left
-    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - cellSize / 2, 'child2'); // Top-right
-    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - 1.5 * cellSize, 'child3'); // Bottom-left
-    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - 1.5 * cellSize, 'child4'); // Bottom-right
-
+    // Recursively create all grounds in the scene
+    createAllGroundsFromLayout(layoutData, scene);
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -86,13 +70,13 @@ function init() {
     const loader = new KMZLoader();
 
     // Load cubes (buildings), lable, x, y(lefting), z are for position. scaleZ is for the building's height which should be the double of posY
-    loadCube(loader, 'Attribute', -3, 0.5, 0, 1, 1, 1, 0x78A8B8);
-    loadCube(loader, 'Range', 3, 1.5, 3, 3, 3, 3, 0xa7cfcb);
-    loadCube(loader, 'Document', 3, 1, 0.5, 1, 1, 1, 0x63392c);
-    loadCube(loader, 'DataNode', 0, 2, 0, 1, 1, 4, 0xf7b29c);
-    loadCube(loader, 'Node', -1, 1, 3, 2, 2, 2, 0xf5d9c1);
-    loadCube(loader, 'HtmlToPlainText', -3, 0.5, -15, 1, 1, 1, 0xf5d9c1);
-    loadCube(loader, 'ListLinks', -10, 2, -15, 1, 1, 4, 0x63392c);
+    createBuilding(loader, 'Attribute', -3, 0.5, 0, 1, 1, 1, 0x78A8B8);
+    createBuilding(loader, 'Range', 3, 1.5, 3, 3, 3, 3, 0xa7cfcb);
+    createBuilding(loader, 'Document', 3, 1, 0.5, 1, 1, 1, 0x63392c);
+    createBuilding(loader, 'DataNode', 0, 2, 0, 1, 1, 4, 0xf7b29c);
+    createBuilding(loader, 'Node', -1, 1, 3, 2, 2, 2, 0xf5d9c1);
+    createBuilding(loader, 'HtmlToPlainText', -3, 0.5, -15, 1, 1, 1, 0xf5d9c1);
+    createBuilding(loader, 'ListLinks', -10, 2, -15, 1, 1, 4, 0x63392c);
 
     // Create communication lines between the cubes, start (same building's position, from which), end (to which), height
     createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0x78A8B8);
@@ -112,35 +96,9 @@ function init() {
     window.addEventListener('resize', onWindowResize);
 }
 
-  // [Correct function] Function to build a deeply nested hierarchy with "children" property
-//   function buildPackageHierarchy(grounds) {
-//     const root = {}; // Initialize an empty root
-
-//     grounds.forEach(ground => {
-//         const parts = ground.label.split('.'); // Split label into parts
-//         let currentLevel = root;
-
-//         parts.forEach((part, index) => {
-//             // Check if this part exists at the current level
-//             if (!currentLevel[part]) {
-//                 // If it's the last part, add ground data; otherwise, initialize "children"
-//                 currentLevel[part] = index === parts.length - 1 
-//                     ? { ...ground, children: {} }  // Leaf nodes have ground data and empty children
-//                     : { children: {} };  // Non-leaf nodes have only children property
-//             }
-
-//             // Move down to the next level in "children"
-//             currentLevel = currentLevel[part].children;
-//         });
-//     });
-
-//     return root;
-// }
-
-
 function buildPackageHierarchy(grounds) {
     const root = { name: 'root', children: [] };  // Root of hierarchy
-    
+
     // Create hierarchical structure by nesting packages
     grounds.forEach(ground => {
         const parts = ground.label.split('.');
@@ -172,123 +130,61 @@ function applyTreemapLayout(rootNode) {
         .sort((a, b) => b.value - a.value);
 
     d3.treemap()
-        .size([rootNode.width || 100, rootNode.depth || 100])
+        .size([100, 100]) // Fixed layout size for consistent centering
         .padding(1)
         .round(true)(root);
 
     return root;
 }
 
-    // Recursive function to position and render grounds based on treemap data
-  // Recursive function to position and render grounds based on treemap data
-function createGroundFromTreemap(node, parentX = 0, parentZ = 0, level = 0, scene) {
-    const { x0, y0, x1, y1 } = node;
-    const width = x1 - x0;
-    const depth = y1 - y0;
-    const x = parentX + x0 + width / 2;
-    const z = parentZ + y0 + depth / 2;
-    const y = level * 0.4;  // Elevate each level
+function centerLayout(root) {
+    let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
+    root.each(node => {
+        if (node.x0 < minX) minX = node.x0;
+        if (node.y0 < minZ) minZ = node.y0;
+        if (node.x1 > maxX) maxX = node.x1;
+        if (node.y1 > maxZ) maxZ = node.y1;
+    });
 
-    // Generate color based on level
-    const color = new THREE.Color(`hsl(${(level * 60) % 360}, 70%, 50%)`);
+    const layoutCenterX = (minX + maxX) / 2;
+    const layoutCenterZ = (minZ + maxZ) / 2;
 
-    // This is where createGround is used to render each ground
-    createGround(width, depth, color, x, y, z, node.data.label, scene);
-
-    if (node.children) {
-        node.children.forEach(child => createGroundFromTreemap(child, x - width / 2, z - depth / 2, level + 1, scene));
-    }
-}
-
-
-function createAllGrounds(grounds) {
-    // Get the hierarchy of packages based on names
-    const packageHierarchy = buildPackageHierarchy(grounds);
-
-    // Find the root package (the one without any parent, no . is in it)
-    let rootGround = grounds.find(ground => !ground.label.includes('.'));
-
-    // Create the root package (main package) at 
-    createGround(rootGround.width, rootGround.depth, 0xFFFFFF, 0, 0, 0, rootGround.label);
-
-    // Start placing the sub-packages
-    placePackages(rootGround, packageHierarchy, 0.1);
-}
-
-function placePackages(parentGround, packageHierarchy, yOffset) {
-    const subGrounds = packageHierarchy[parentGround.label] || [];
-    const padding = 5;  // Reduced padding for more compact layout
-
-    // Calculate initial position inside the parent ground
-    let nextX = -parentGround.width / 2 + padding;
-    let nextZ = -parentGround.depth / 2 + padding;  // Start from bottom-left inside the parent
-
-    subGrounds.forEach(subGround => {
-        // Check if we overflow parent's width, adjust position for new row if needed
-        if (nextX + subGround.width + padding > parentGround.width / 2) {
-            // Move to the next row
-            nextX = -parentGround.width / 2 + padding;
-            nextZ += subGround.depth + padding;
-        }
-
-        // Place the sub-ground
-        createGround(subGround.width, subGround.depth, 0xebe8e8, nextX, yOffset, nextZ, subGround.label);
-
-        // Move to the next sub-ground position
-        nextX += subGround.width + padding;
-
-        // Recursively handle the child elements
-        if (packageHierarchy[subGround.label]) {
-            // Increase yOffset for stacking higher as we go deeper into the hierarchy
-            placePackages(subGround, packageHierarchy, yOffset + 0.1);
-        }
+    root.each(node => {
+        node.x0 -= layoutCenterX;
+        node.x1 -= layoutCenterX;
+        node.y0 -= layoutCenterZ;
+        node.y1 -= layoutCenterZ;
     });
 }
 
-// function createAllGrounds(grounds) {
-//     let rootGround = grounds.find(ground => ground.isRoot);
+// Recursive function to create all grounds based on layout
+function createAllGroundsFromLayout(node, scene) {
+    createGroundFromTreemap(node, 0, scene);
+}
 
-//     // Position the root ground at (0, 0, 0)
-//     let rootWidth = rootGround.width;
-//     let rootDepth = rootGround.depth;
+// Recursive function to position and render grounds based on treemap data
+function createGroundFromTreemap(node, level, scene) {
+    const { x0, y0, x1, y1 } = node;
+    const width = x1 - x0;
+    const depth = y1 - y0;
+    const x = x0 + width / 2;
+    const z = y0 + depth / 2;
+    const y = level * 0.4;  // Elevate each level slightly
 
-//     // Create the root ground at the origin
-//     createGround(rootWidth, rootDepth, 0xFFFFFF, 0, 0, 0, rootGround.label);
+    // Calculate the shade of grey based on the level (0 = white, higher levels get progressively darker)
+    const lightness = Math.max(100 - level * 15, 0);  // Decrease lightness by 15% per level, but not below 0
+    const color = new THREE.Color(`hsl(0, 0%, ${lightness}%)`);
 
-//     let yOffset = 0.1;  // Slightly above the root ground
-//     let padding = 25;    // Space between grounds to avoid overlap
+    // Create the ground with the calculated grey color
+    const label = node.data?.label || "";
+    console.log(label);
+    createGround(width, depth, color, x, y, z, label);
 
-//     // Define initial X and Z for placing non-root grounds
-//     let nextX = -rootWidth / 2 + padding; // Start at the left boundary with padding
-//     let nextZ = -rootDepth / 2 + padding; // Start near the back boundary with padding
-//     let maxRowHeight = 0;  // Keep track of the tallest item in the current row to move to the next row properly
-
-//     // Place non-root grounds dynamically on top of the root ground, avoiding overlap
-//     grounds.forEach(ground => {
-//         if (!ground.isRoot) {
-//             // Check if the ground would go beyond the root ground's width
-//             if (nextX + ground.width + padding > rootWidth / 2) {
-//                 // Move to the next row
-//                 nextX = -rootWidth / 2 + padding;
-//                 nextZ += maxRowHeight + padding;  // Move down by the height of the largest item in the row
-//                 maxRowHeight = 0;  // Reset for the new row
-//             }
-
-//             // Place the non-root ground
-//             createGround(ground.width, ground.depth, 0xebe8e8, nextX, yOffset, nextZ, ground.label);
-
-//             // Update the max row height if the current ground is taller
-//             if (ground.depth > maxRowHeight) {
-//                 maxRowHeight = ground.depth;
-//             }
-
-//             // Update the X position for the next ground
-//             nextX += ground.width + padding;
-//         }
-//     });
-// }
-
-
+    // Recur for each child without using parent's x and z positions
+    if (node.children) {
+        node.children.forEach(child => createGroundFromTreemap(child, level + 1, scene));
+    }
+}
 
 
 // Function to create a ground (district) and add a label
@@ -309,12 +205,11 @@ function createGround(width, depth, color, x, y, z, labelText) {
     const labelZ = z + depth / 2.1;  // Bottom of the ground in the Z direction
     const labelY = y + 0.2;  // Slightly above the ground to avoid clipping
 
-
     addGroundLabel(labelText, labelX, labelY, labelZ, 0.8);
 }
 
 // Function to load a cube (building) with a hoverable label, pos is where the building is on the grid, scale is the size of the buidng where y is length, x is width, and z is height
-function loadCube(loader, label, posX, posY, posZ, scaleX, scaleY, scaleZ, color) {
+function createBuilding(loader, label, posX, posY, posZ, scaleX, scaleY, scaleZ, color) {
     loader.load('./examples_models_kmz_Box.kmz', function (kmz) {
         kmz.scene.position.set(posX, posY, posZ);
         kmz.scene.scale.z = scaleZ;
