@@ -3,6 +3,7 @@ import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import { KMZLoader } from 'jsm/loaders/KMZLoader.js';
 import { FontLoader } from "jsm/loaders/FontLoader.js";
 import { TextGeometry } from "jsm/geometries/TextGeometry.js";
+// Using D3.js Treemap layout to position (x,y,z) of districts and buildings correctly and dynamically 
 import * as d3 from "d3";
 
 let camera, scene, renderer;
