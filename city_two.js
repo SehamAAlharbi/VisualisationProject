@@ -36,26 +36,30 @@ function init() {
 
 
     const grounds = [
-        { width: 200, depth: 200, label: 'org',  index: 0 },
-        { width: 150, depth: 150, label: 'org.jsoup',  index: 1 },
-        { width: 30, depth: 30, label: 'org.jsoup.nodes', index: 2 },
-        { width: 20, depth: 20, label: 'org.jsoup.nodes.x', index: 2 },
-        { width: 50, depth: 50, label: 'org.jsoup.examples', index: 3 },
-        { width: 20, depth: 20, label: 'org.jsoup.examples.x', index: 3 },
-        { width: 10, depth: 10, label: 'org.jsoup.examples.x.y', index: 3 }
-        // { width: 5, depth: 5, label: 'org.jsoup.examples.1', isRoot: false, index: 3 },
-        // { width: 5, depth: 5, label: 'org.jsoup.examples.2', isRoot: false, index: 4 },
-        // { width: 5, depth: 5, label: 'org.jsoup.nodes.3', isRoot: false, index: 5 },
-        // { width: 5, depth: 5, label: 'org.jsoup.nodes.4', isRoot: false, index: 6 }
+        { width: 100, depth: 100, label: 'org', index: 0 },
+        { width: 50, depth: 50, label: 'org.jsoup', index: 1 },
+        { width: 10, depth: 10, label: 'org.jsoup.nodes', index: 2 },
+        { width: 20, depth: 20, label: 'org.jsoup.select', index: 3 },
+        { width: 30, depth: 30, label: 'org.jsoup.safety', index: 4 },
+        { width: 15, depth: 15, label: 'org.jsoup.helper', index: 5 }
     ];
 
     // creating grounds dynamiclly 
-    createAllGrounds(grounds);
+    // createAllGrounds(grounds);
 
-    // Create grounds (districts) with lables, each is smaller than the other, size is width and depth, position is x,z, left ubovae the ground is y
-    // createGround(80, 80, 0xFFFFFF, 0, 0, 0, 'org.jsoup'); 
-    // createGround(40, 40, 0xebe8e8, -10, 0.1, 15, 'nodes'); 
-    // createGround(20, 20, 0xebe8e8, -10, 0.1, -20, 'examples');
+    const padding = 4;
+    const groundSize = 40;
+    const effectiveSize = 100 - 2 * padding;
+    const cellSize = effectiveSize / 2; // Size for each "cell" in the grid
+
+    createGround(100, 100, 0xFFFFFF, 0, 0, 0, 'parent'); // Parent centered at (0, 0, 0)
+
+    // Positions for each cell with padding accounted for
+    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - cellSize / 2, 'child1'); // Top-left
+    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - cellSize / 2, 'child2'); // Top-right
+    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - 1.5 * cellSize, 'child3'); // Bottom-left
+    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - 1.5 * cellSize, 'child4'); // Bottom-right
+
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -79,11 +83,11 @@ function init() {
     loadCube(loader, 'ListLinks', -10, 2, -15, 1, 1, 4, 0x63392c);
 
     // Create communication lines between the cubes, start (same building's position, from which), end (to which), height
-    createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(3, 1.5, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(3, 1, 0.5), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(0, 2, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]');
-    createCommunicationLine(new THREE.Vector3(-1, 1, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]');
+    createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0x78A8B8);
+    createCommunicationLine(new THREE.Vector3(3, 1.5, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0xa7cfcb);
+    createCommunicationLine(new THREE.Vector3(3, 1, 0.5), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0x63392c);
+    createCommunicationLine(new THREE.Vector3(0, 2, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0xf7b29c);
+    createCommunicationLine(new THREE.Vector3(-1, 1, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0xf5d9c1);
 
 
     // Setup camera controls (orbit around the scene)
@@ -96,28 +100,39 @@ function init() {
     window.addEventListener('resize', onWindowResize);
 }
 
-function getPackageHierarchy(grounds) {
-    const packageHierarchy = {};
+  // [Correct function] Function to build a deeply nested hierarchy with "children" property
+  function buildPackageHierarchy(grounds) {
+    const root = {}; // Initialize an empty root
 
     grounds.forEach(ground => {
-        const parentPackage = ground.label.split('.').slice(0, -1).join('.');
-        if (!packageHierarchy[parentPackage]) {
-            packageHierarchy[parentPackage] = [];
-        }
-        packageHierarchy[parentPackage].push(ground);
+        const parts = ground.label.split('.'); // Split label into parts
+        let currentLevel = root;
+
+        parts.forEach((part, index) => {
+            // Check if this part exists at the current level
+            if (!currentLevel[part]) {
+                // If it's the last part, add ground data; otherwise, initialize "children"
+                currentLevel[part] = index === parts.length - 1 
+                    ? { ...ground, children: {} }  // Leaf nodes have ground data and empty children
+                    : { children: {} };  // Non-leaf nodes have only children property
+            }
+
+            // Move down to the next level in "children"
+            currentLevel = currentLevel[part].children;
+        });
     });
 
-    return packageHierarchy;
+    return root;
 }
 
 function createAllGrounds(grounds) {
     // Get the hierarchy of packages based on names
-    const packageHierarchy = getPackageHierarchy(grounds);
+    const packageHierarchy = buildPackageHierarchy(grounds);
 
-    // Find the root package (the one without any parent)
+    // Find the root package (the one without any parent, no . is in it)
     let rootGround = grounds.find(ground => !ground.label.includes('.'));
-    
-    // Create the root package (main package)
+
+    // Create the root package (main package) at 
     createGround(rootGround.width, rootGround.depth, 0xFFFFFF, 0, 0, 0, rootGround.label);
 
     // Start placing the sub-packages
@@ -125,26 +140,34 @@ function createAllGrounds(grounds) {
 }
 
 function placePackages(parentGround, packageHierarchy, yOffset) {
-    const subPackages = packageHierarchy[parentGround.label] || [];
-    let xOffset = -parentGround.width / 2 + 20; // Initial X offset for sub-packages
-    let zOffset = -parentGround.depth / 2 + 20; // Initial Z offset for sub-packages
-    let rowMaxHeight = 0;
+    const subGrounds = packageHierarchy[parentGround.label] || [];
+    const padding = 5;  // Reduced padding for more compact layout
 
-    subPackages.forEach(subGround => {
-        // Always lift sub-packages, even if they have no further children
-        yOffset += 0.1;  // Lift the sub-package above the parent
+    // Calculate initial position inside the parent ground
+    let nextX = -parentGround.width / 2 + padding;
+    let nextZ = -parentGround.depth / 2 + padding;  // Start from bottom-left inside the parent
 
-        createGround(subGround.width, subGround.depth, 0xebe8e8, 0, yOffset, 0, subGround.label);
+    subGrounds.forEach(subGround => {
+        // Check if we overflow parent's width, adjust position for new row if needed
+        if (nextX + subGround.width + padding > parentGround.width / 2) {
+            // Move to the next row
+            nextX = -parentGround.width / 2 + padding;
+            nextZ += subGround.depth + padding;
+        }
 
-        // Recursively place child packages if any exist
+        // Place the sub-ground
+        createGround(subGround.width, subGround.depth, 0xebe8e8, nextX, yOffset, nextZ, subGround.label);
+
+        // Move to the next sub-ground position
+        nextX += subGround.width + padding;
+
+        // Recursively handle the child elements
         if (packageHierarchy[subGround.label]) {
-            placePackages(subGround, packageHierarchy, yOffset);  // Stack child packages
+            // Increase yOffset for stacking higher as we go deeper into the hierarchy
+            placePackages(subGround, packageHierarchy, yOffset + 0.1);
         }
     });
 }
-
-
-
 
 // function createAllGrounds(grounds) {
 //     let rootGround = grounds.find(ground => ground.isRoot);
@@ -157,7 +180,7 @@ function placePackages(parentGround, packageHierarchy, yOffset) {
 //     createGround(rootWidth, rootDepth, 0xFFFFFF, 0, 0, 0, rootGround.label);
 
 //     let yOffset = 0.1;  // Slightly above the root ground
-//     let padding = 20;    // Space between grounds to avoid overlap
+//     let padding = 25;    // Space between grounds to avoid overlap
 
 //     // Define initial X and Z for placing non-root grounds
 //     let nextX = -rootWidth / 2 + padding; // Start at the left boundary with padding
@@ -188,9 +211,13 @@ function placePackages(parentGround, packageHierarchy, yOffset) {
 //         }
 //     });
 // }
+
+
+
+
 // Function to create a ground (district) and add a label
 function createGround(width, depth, color, x, y, z, labelText) {
-    const groundGeometry = new THREE.BoxGeometry(width, 0.15, depth);
+    const groundGeometry = new THREE.BoxGeometry(width, 0.5, depth);
     const groundMaterial = new THREE.MeshPhongMaterial({
         color: color,
         shininess: 150,
@@ -302,7 +329,7 @@ function addGroundLabel(text, positionX, positionY, positionZ, size) {
 
 
 // Function to create communication lines between cubes
-function createCommunicationLine(start, end, curveHeight, label) {
+function createCommunicationLine(start, end, curveHeight, label, color) {
     // Define the control points for the curve (start, middle, and end)
     const middlePoint = new THREE.Vector3(
         (start.x + end.x) / 2,  // Midpoint of x
@@ -318,7 +345,7 @@ function createCommunicationLine(start, end, curveHeight, label) {
 
     // Material for the line (yellow color)
     const tubeMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
+        color: color,
         transparent: true,  // Enable transparency
         opacity: 0.6        // Set opacity to make it softer and more transparent
     });
