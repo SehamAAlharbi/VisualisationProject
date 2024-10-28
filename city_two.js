@@ -3,6 +3,7 @@ import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import { KMZLoader } from 'jsm/loaders/KMZLoader.js';
 import { FontLoader } from "jsm/loaders/FontLoader.js";
 import { TextGeometry } from "jsm/geometries/TextGeometry.js";
+import * as d3 from "d3";
 
 let camera, scene, renderer;
 
@@ -37,28 +38,38 @@ function init() {
 
     const grounds = [
         { width: 100, depth: 100, label: 'org', index: 0 },
-        { width: 50, depth: 50, label: 'org.jsoup', index: 1 },
-        { width: 10, depth: 10, label: 'org.jsoup.nodes', index: 2 },
-        { width: 20, depth: 20, label: 'org.jsoup.select', index: 3 },
-        { width: 30, depth: 30, label: 'org.jsoup.safety', index: 4 },
-        { width: 15, depth: 15, label: 'org.jsoup.helper', index: 5 }
+        { width: 60, depth: 60, label: 'org.jsoup', index: 1 },
+        { width: 5, depth: 5, label: 'org.jsoup.nodes', index: 2 },
+        { width: 5, depth: 5, label: 'org.jsoup.select', index: 3 },
+        { width: 5, depth: 5, label: 'org.jsoup.safety', index: 4 },
+        { width: 5, depth: 5, label: 'org.jsoup.helper', index: 5 }
+
     ];
+
+
+    // use with D3.js
+    const hierarchyData = buildPackageHierarchy(grounds);
+    const layoutData = applyTreemapLayout(hierarchyData);
+    // Create grounds in the scene
+    layoutData.children.forEach(child => createGroundFromTreemap(child, 0, 0, 0, scene));
+
+
 
     // creating grounds dynamiclly 
     // createAllGrounds(grounds);
 
-    const padding = 4;
-    const groundSize = 40;
-    const effectiveSize = 100 - 2 * padding;
-    const cellSize = effectiveSize / 2; // Size for each "cell" in the grid
+    // const padding = 4;
+    // const groundSize = 40;
+    // const effectiveSize = 100 - 2 * padding;
+    // const cellSize = effectiveSize / 2; // Size for each "cell" in the grid
 
-    createGround(100, 100, 0xFFFFFF, 0, 0, 0, 'parent'); // Parent centered at (0, 0, 0)
+    // createGround(100, 100, 0xFFFFFF, 0, 0, 0, 'parent'); // Parent centered at (0, 0, 0)
 
-    // Positions for each cell with padding accounted for
-    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - cellSize / 2, 'child1'); // Top-left
-    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - cellSize / 2, 'child2'); // Top-right
-    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - 1.5 * cellSize, 'child3'); // Bottom-left
-    createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - 1.5 * cellSize, 'child4'); // Bottom-right
+    // // Positions for each cell with padding accounted for
+    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - cellSize / 2, 'child1'); // Top-left
+    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - cellSize / 2, 'child2'); // Top-right
+    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + cellSize / 2, 0.1, 50 - padding - 1.5 * cellSize, 'child3'); // Bottom-left
+    // createGround(groundSize, groundSize, 0xebe8e8, -50 + padding + 1.5 * cellSize, 0.1, 50 - padding - 1.5 * cellSize, 'child4'); // Bottom-right
 
 
     // Renderer setup
@@ -101,29 +112,93 @@ function init() {
 }
 
   // [Correct function] Function to build a deeply nested hierarchy with "children" property
-  function buildPackageHierarchy(grounds) {
-    const root = {}; // Initialize an empty root
+//   function buildPackageHierarchy(grounds) {
+//     const root = {}; // Initialize an empty root
 
+//     grounds.forEach(ground => {
+//         const parts = ground.label.split('.'); // Split label into parts
+//         let currentLevel = root;
+
+//         parts.forEach((part, index) => {
+//             // Check if this part exists at the current level
+//             if (!currentLevel[part]) {
+//                 // If it's the last part, add ground data; otherwise, initialize "children"
+//                 currentLevel[part] = index === parts.length - 1 
+//                     ? { ...ground, children: {} }  // Leaf nodes have ground data and empty children
+//                     : { children: {} };  // Non-leaf nodes have only children property
+//             }
+
+//             // Move down to the next level in "children"
+//             currentLevel = currentLevel[part].children;
+//         });
+//     });
+
+//     return root;
+// }
+
+
+function buildPackageHierarchy(grounds) {
+    const root = { name: 'root', children: [] };  // Root of hierarchy
+    
+    // Create hierarchical structure by nesting packages
     grounds.forEach(ground => {
-        const parts = ground.label.split('.'); // Split label into parts
+        const parts = ground.label.split('.');
         let currentLevel = root;
 
         parts.forEach((part, index) => {
-            // Check if this part exists at the current level
-            if (!currentLevel[part]) {
-                // If it's the last part, add ground data; otherwise, initialize "children"
-                currentLevel[part] = index === parts.length - 1 
-                    ? { ...ground, children: {} }  // Leaf nodes have ground data and empty children
-                    : { children: {} };  // Non-leaf nodes have only children property
+            // Look for an existing child node
+            let child = currentLevel.children.find(c => c.name === part);
+            if (!child) {
+                child = index === parts.length - 1
+                    ? { ...ground, name: part, children: [] }  // Leaf node
+                    : { name: part, children: [] };  // Non-leaf node
+
+                currentLevel.children.push(child);
             }
 
-            // Move down to the next level in "children"
-            currentLevel = currentLevel[part].children;
+            // Move down the hierarchy
+            currentLevel = child;
         });
     });
 
     return root;
 }
+
+// Apply D3 treemap layout to assign positions within parent bounds
+function applyTreemapLayout(rootNode) {
+    const root = d3.hierarchy(rootNode)
+        .sum(d => d.width * d.depth)
+        .sort((a, b) => b.value - a.value);
+
+    d3.treemap()
+        .size([rootNode.width || 100, rootNode.depth || 100])
+        .padding(1)
+        .round(true)(root);
+
+    return root;
+}
+
+    // Recursive function to position and render grounds based on treemap data
+  // Recursive function to position and render grounds based on treemap data
+function createGroundFromTreemap(node, parentX = 0, parentZ = 0, level = 0, scene) {
+    const { x0, y0, x1, y1 } = node;
+    const width = x1 - x0;
+    const depth = y1 - y0;
+    const x = parentX + x0 + width / 2;
+    const z = parentZ + y0 + depth / 2;
+    const y = level * 0.4;  // Elevate each level
+
+    // Generate color based on level
+    const color = new THREE.Color(`hsl(${(level * 60) % 360}, 70%, 50%)`);
+
+    // This is where createGround is used to render each ground
+    createGround(width, depth, color, x, y, z, node.data.label, scene);
+
+    if (node.children) {
+        node.children.forEach(child => createGroundFromTreemap(child, x - width / 2, z - depth / 2, level + 1, scene));
+    }
+}
+
 
 function createAllGrounds(grounds) {
     // Get the hierarchy of packages based on names
