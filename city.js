@@ -8,6 +8,9 @@ import * as d3 from "d3";
 
 let camera, scene, renderer;
 
+// Array of predefined colors
+const colors = [0x78A8B8, 0xa7cfcb, 0x63392c, 0xf7b29c, 0xf5d9c1];
+
 init();
 
 function init() {
@@ -40,22 +43,34 @@ function init() {
     const grounds = [
         { width: 80, depth: 80, label: 'org', index: 0 },
         { width: 50, depth: 50, label: 'org.jsoup', index: 1 },
-        { width: 30, depth: 30, label: 'org.jsoup.nodes', index: 2 },
-        { width: 5, depth: 5, label: 'org.jsoup.select', index: 3 },
-        { width: 10, depth: 10, label: 'org.jsoup.safety', index: 4 },
-        { width: 5, depth: 5, label: 'org.jsoup.helper', index: 5 }
+        { width: 20, depth: 20, label: 'org.jsoup.nodes', index: 2 },
+        { width: 20, depth: 20, label: 'org.jsoup.select', index: 3 },
+        { width: 20, depth: 20, label: 'org.jsoup.safety', index: 4 },
+        { width: 20, depth: 20, label: 'org.jsoup.helper', index: 5 },
+        { width: 20, depth: 20, label: 'org.jsoup.parser', index: 6 },
+        { width: 25, depth: 25, label: 'org.jsoup.examples', index: 7 }
 
     ];
 
-    // createGround(100, 100, 0xFFFFFF, 0, 10, 0, 'Seham');
+    const buildings = [
+        { label: 'Attribute', scaleX: 1, scaleY: 1, scaleZ: 20, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'UncheckedIOException', scaleX: 3, scaleY: 3, scaleZ: 3, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'Test', scaleX: 3, scaleY: 3, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'Document', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'Node', scaleX: 2, scaleY: 2, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'HtmlToPlainText', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: 'ListLinks', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples' }
+
+    ];
 
     // Use treemap from D3.js
-    const hierarchyData = buildPackageHierarchy(grounds);
-    const layoutData = applyTreemapLayout(hierarchyData);
-    centerLayout(layoutData); // Center the layout
+    const hierarchyGroundsData = buildPackageHierarchy(grounds);
+    const layoutGroundsData = applyTreemapLayout(hierarchyGroundsData);
+    centerLayout(layoutGroundsData); // Center the layout
 
     // Recursively create all grounds in the scene
-    createAllGroundsFromLayout(layoutData, scene);
+    createGroundFromTreemap(layoutGroundsData, 0, buildings, scene);
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -67,23 +82,12 @@ function init() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    const loader = new KMZLoader();
-
-    // Load cubes (buildings), lable, x, y(lefting), z are for position. scaleZ is for the building's height which should be the double of posY
-    createBuilding(loader, 'Attribute', -3, 0.5, 0, 1, 1, 1, 0x78A8B8);
-    createBuilding(loader, 'Range', 3, 1.5, 3, 3, 3, 3, 0xa7cfcb);
-    createBuilding(loader, 'Document', 3, 1, 0.5, 1, 1, 1, 0x63392c);
-    createBuilding(loader, 'DataNode', 0, 2, 0, 1, 1, 4, 0xf7b29c);
-    createBuilding(loader, 'Node', -1, 1, 3, 2, 2, 2, 0xf5d9c1);
-    createBuilding(loader, 'HtmlToPlainText', -3, 0.5, -15, 1, 1, 1, 0xf5d9c1);
-    createBuilding(loader, 'ListLinks', -10, 2, -15, 1, 1, 4, 0x63392c);
-
     // Create communication lines between the cubes, start (same building's position, from which), end (to which), height
-    createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0x78A8B8);
-    createCommunicationLine(new THREE.Vector3(3, 1.5, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0xa7cfcb);
-    createCommunicationLine(new THREE.Vector3(3, 1, 0.5), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0x63392c);
-    createCommunicationLine(new THREE.Vector3(0, 2, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0xf7b29c);
-    createCommunicationLine(new THREE.Vector3(-1, 1, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0xf5d9c1);
+    // createCommunicationLine(new THREE.Vector3(-3, 0.5, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0x78A8B8);
+    // createCommunicationLine(new THREE.Vector3(3, 1.5, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0xa7cfcb);
+    // createCommunicationLine(new THREE.Vector3(3, 1, 0.5), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0x63392c);
+    // createCommunicationLine(new THREE.Vector3(0, 2, 0), new THREE.Vector3(-10, 2, -15), 16, '[Line No:   ][Usage Type:    ]', 0xf7b29c);
+    // createCommunicationLine(new THREE.Vector3(-1, 1, 3), new THREE.Vector3(-3, 0.5, -15), 16, '[Line No:   ][Usage Type:    ]', 0xf5d9c1);
 
 
     // Setup camera controls (orbit around the scene)
@@ -94,6 +98,10 @@ function init() {
 
     // Resize event listener
     window.addEventListener('resize', onWindowResize);
+}
+
+function getRandomColor() {
+    return colors[Math.floor(Math.random() * colors.length)];
 }
 
 function buildPackageHierarchy(grounds) {
@@ -157,33 +165,54 @@ function centerLayout(root) {
     });
 }
 
-// Recursive function to create all grounds based on layout
-function createAllGroundsFromLayout(node, scene) {
-    createGroundFromTreemap(node, 0, scene);
-}
-
 // Recursive function to position and render grounds based on treemap data
-function createGroundFromTreemap(node, level, scene) {
-    const { x0, y0, x1, y1 } = node;
+function createGroundFromTreemap(ground, level, buildings, scene) {
+    const { x0, y0, x1, y1 } = ground;
     const width = x1 - x0;
     const depth = y1 - y0;
     const x = x0 + width / 2;
     const z = y0 + depth / 2;
-    const y = level * 0.4;  // Elevate each level slightly
+    const y = level * 0.4;
 
-    // Calculate the shade of grey based on the level (0 = white, higher levels get progressively darker)
-    const lightness = Math.max(100 - level * 15, 0);  // Decrease lightness by 15% per level, but not below 0
+    const lightness = Math.max(100 - level * 15, 0);
     const color = new THREE.Color(`hsl(0, 0%, ${lightness}%)`);
+    const label = ground.data?.label ? ground.data.label.split('.').pop() : "";
 
-    // Create the ground with the calculated grey color
-    const label = node.data?.label || "";
-    console.log(label);
     createGround(width, depth, color, x, y, z, label);
 
-    // Recur for each child without using parent's x and z positions
-    if (node.children) {
-        node.children.forEach(child => createGroundFromTreemap(child, level + 1, scene));
+    // Filter buildings for the current ground and apply a treemap layout
+    const groundBuildings = buildings.filter(b => b.package === ground.data.label);
+
+    if (groundBuildings.length > 0) {
+        const layoutBuildingsData = applyBuildingTreemapLayout(groundBuildings, width, depth);
+
+        if (layoutBuildingsData && layoutBuildingsData.children) {
+            layoutBuildingsData.children.forEach(buildingData => {
+                createBuildingFromData(buildingData, x, y, z, width, depth, scene); // Pass width and depth
+            });
+        } else {
+            console.warn(`No children generated for buildings layout on ground: ${ground.data.label}`);
+        }
+    } else {
+        console.warn(`No buildings found for ground: ${ground.data.label}`);
     }
+
+    if (ground.children) {
+        ground.children.forEach(child => createGroundFromTreemap(child, level + 1, buildings, scene));
+    }
+}
+
+// Treemap layout function for buildings
+function applyBuildingTreemapLayout(buildings, width, depth) {
+    const root = d3.hierarchy({ children: buildings })
+        .sum(d => d.scaleX * d.scaleZ) // Summing area as the product of width and depth
+        .sort((a, b) => b.value - a.value);
+
+    d3.treemap()
+        .size([width, depth])
+        .padding(1)(root);
+
+    return root;
 }
 
 
@@ -208,10 +237,22 @@ function createGround(width, depth, color, x, y, z, labelText) {
     addGroundLabel(labelText, labelX, labelY, labelZ, 0.8);
 }
 
+// Helper function to create a building dynamically positioned within ground bounds
+function createBuildingFromData(buildingData, groundX, groundY, groundZ, width, depth, scene) {
+    const { x0, y0, x1, y1 } = buildingData;
+    const building = buildingData.data;
+    const posX = groundX + (x0 + x1) / 2 - width / 2;
+    const posZ = groundZ + (y0 + y1) / 2 - depth / 2;
+    const posY = groundY + 0.5;
+
+    createBuilding(new KMZLoader(), building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
+}
+
 // Function to load a cube (building) with a hoverable label, pos is where the building is on the grid, scale is the size of the buidng where y is length, x is width, and z is height
 function createBuilding(loader, label, posX, posY, posZ, scaleX, scaleY, scaleZ, color) {
     loader.load('./examples_models_kmz_Box.kmz', function (kmz) {
         kmz.scene.position.set(posX, posY, posZ);
+        // So the building stays on the ground surface the scale.z should be doubled the value of posY
         kmz.scene.scale.z = scaleZ;
         kmz.scene.scale.x = scaleX;
         kmz.scene.scale.y = scaleY;
