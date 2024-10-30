@@ -54,7 +54,7 @@ function init() {
 
     const buildings = [
         { label: 'Attribute', scaleX: 1, scaleY: 1, scaleZ: 20, color: getRandomColor(), package: 'org.jsoup.nodes' },
-        { label: 'UncheckedIOException', scaleX: 3, scaleY: 3, scaleZ: 3, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'UncheckedIOException', scaleX: 1, scaleY: 1, scaleZ: 10, color: getRandomColor(), package: 'org.jsoup' },
         { label: 'Test', scaleX: 3, scaleY: 3, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup' },
         { label: 'Document', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes' },
         { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes' },
@@ -251,11 +251,9 @@ function createBuildingFromData(buildingData, groundX, groundY, groundZ, width, 
 // Function to load a cube (building) with a hoverable label, pos is where the building is on the grid, scale is the size of the buidng where y is length, x is width, and z is height
 function createBuilding(loader, label, posX, posY, posZ, scaleX, scaleY, scaleZ, color) {
     loader.load('./examples_models_kmz_Box.kmz', function (kmz) {
-        kmz.scene.position.set(posX, posY, posZ);
+        kmz.scene.position.set(posX, posY + scaleZ / 2, posZ);
         // So the building stays on the ground surface the scale.z should be doubled the value of posY
-        kmz.scene.scale.z = scaleZ;
-        kmz.scene.scale.x = scaleX;
-        kmz.scene.scale.y = scaleY;
+        kmz.scene.scale.set(scaleX, scaleY, scaleZ);
         scene.add(kmz.scene);
 
         kmz.scene.traverse(function (child) {
