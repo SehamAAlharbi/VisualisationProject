@@ -11,6 +11,9 @@ let camera, scene, renderer;
 // Array of predefined colors
 const colors = [0x78A8B8, 0xa7cfcb, 0x63392c, 0xf7b29c, 0xf5d9c1];
 
+// Global object to track reserved areas for each parent ground
+const reservedAreas = {};
+
 init();
 
 function init() {
@@ -44,7 +47,8 @@ function init() {
         { width: 80, depth: 80, label: 'org', index: 0 },
         { width: 50, depth: 50, label: 'org.jsoup', index: 1 },
         { width: 20, depth: 20, label: 'org.jsoup.nodes', index: 2 },
-        { width: 20, depth: 20, label: 'org.jsoup.select', index: 3 },
+        { width: 30, depth: 30, label: 'org.jsoup.select', index: 3 },
+        { width: 20, depth: 20, label: 'org.jsoup.select.test', index: 3 },
         { width: 20, depth: 20, label: 'org.jsoup.safety', index: 4 },
         { width: 20, depth: 20, label: 'org.jsoup.helper', index: 5 },
         { width: 20, depth: 20, label: 'org.jsoup.parser', index: 6 },
@@ -56,12 +60,22 @@ function init() {
         { label: 'Attribute', scaleX: 1, scaleY: 1, scaleZ: 20, color: getRandomColor(), package: 'org.jsoup.nodes' },
         { label: 'UncheckedIOException', scaleX: 1, scaleY: 1, scaleZ: 10, color: getRandomColor(), package: 'org.jsoup' },
         { label: 'Test', scaleX: 3, scaleY: 3, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup' },
-        { label: 'Document', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes' },
-        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes' },
-        { label: 'Node', scaleX: 2, scaleY: 2, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'UncheckedIOException', scaleX: 1, scaleY: 1, scaleZ: 10, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'Test', scaleX: 3, scaleY: 3, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'UncheckedIOException', scaleX: 1, scaleY: 1, scaleZ: 10, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'Test', scaleX: 3, scaleY: 3, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup' },
+        { label: 'Document', scaleX: 2, scaleY: 2, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'Test', scaleX: 2, scaleY: 2, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes' },
+        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select' },
+        { label: 'Node', scaleX: 2, scaleY: 2, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.test' },
         { label: 'HtmlToPlainText', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples' },
-        { label: 'ListLinks', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples' }
-
+        { label: 'ListLinks', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: '1', scaleX: 1, scaleY: 2, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: '2', scaleX: 2, scaleY: 1, scaleZ: 3, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: '3', scaleX: 4, scaleY: 2, scaleZ: 6, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: '4', scaleX: 4, scaleY: 5, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: '5', scaleX: 3, scaleY: 2, scaleZ: 8, color: getRandomColor(), package: 'org.jsoup.examples' },
+        { label: '6', scaleX: 2, scaleY: 2, scaleZ: 10, color: getRandomColor(), package: 'org.jsoup.examples' }
     ];
 
     // Use treemap from D3.js
@@ -180,27 +194,79 @@ function createGroundFromTreemap(ground, level, buildings, scene) {
 
     createGround(width, depth, color, x, y, z, label);
 
-    // Filter buildings for the current ground and apply a treemap layout
-    const groundBuildings = buildings.filter(b => b.package === ground.data.label);
+    if (isParent(ground)) {
+        // Initialize reserved area for the parent ground
+        reservedAreas[ground.data.label] = { x: x0, z: y0, width: width, depth: depth, usedX: x0, usedZ: y0 };
 
-    if (groundBuildings.length > 0) {
-        const layoutBuildingsData = applyBuildingTreemapLayout(groundBuildings, width, depth);
+        // Step 1: Place child grounds and reserve their spaces
+        ground.children.forEach(child => {
+            createGroundFromTreemap(child, level + 1, buildings, scene);
 
-        if (layoutBuildingsData && layoutBuildingsData.children) {
-            layoutBuildingsData.children.forEach(buildingData => {
-                createBuildingFromData(buildingData, x, y, z, width, depth, scene); // Pass width and depth
-            });
-        } else {
-            console.warn(`No children generated for buildings layout on ground: ${ground.data.label}`);
-        }
+            // After placing child grounds, update the reserved area
+            const childWidth = child.x1 - child.x0;
+            const childDepth = child.y1 - child.y0;
+
+            reservedAreas[ground.data.label].usedX += childWidth + 1; // Add some padding
+
+            // Reset X and move Z down when exceeding parent width
+            if (reservedAreas[ground.data.label].usedX + childWidth > x1) {
+                reservedAreas[ground.data.label].usedX = x0;
+                reservedAreas[ground.data.label].usedZ += childDepth + 1;
+            }
+        });
+
+        // Step 2: Place parent buildings in the remaining space within the reserved area
+        const parentBuildings = buildings.filter(b => b.package === ground.data.label);
+        let currentX = reservedAreas[ground.data.label].usedX;
+        let currentZ = reservedAreas[ground.data.label].usedZ;
+        const buildingPadding = 0.5;
+
+        parentBuildings.forEach(building => {
+            const buildingWidth = building.scaleX;
+            const buildingDepth = building.scaleZ;
+
+            // Ensure the building is within the reserved area boundaries
+            if (currentX + buildingWidth > x1) {
+                currentX = x0; // Reset to start of row
+                currentZ += buildingDepth + buildingPadding; // Move down for a new row
+            }
+
+            // Position the building
+            const posX = currentX + buildingWidth / 2;
+            const posY = y + 0.5; // Slightly above the ground level
+            const posZ = currentZ + buildingDepth / 2;
+
+            createBuilding(new KMZLoader(), building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
+
+            // Update current position
+            currentX += buildingWidth + buildingPadding;
+        });
     } else {
-        console.warn(`No buildings found for ground: ${ground.data.label}`);
-    }
+        // Handle leaf grounds without children
+        const groundBuildings = buildings.filter(b => b.package === ground.data.label);
+        if (groundBuildings.length > 0) {
+            const layoutBuildingsData = applyBuildingTreemapLayout(groundBuildings, width, depth);
+            layoutBuildingsData.children.forEach(buildingData => {
+                createBuildingFromData(buildingData, x, y, z, width, depth, scene);
+            });
+        }
 
-    if (ground.children) {
-        ground.children.forEach(child => createGroundFromTreemap(child, level + 1, buildings, scene));
+        if (ground.children) {
+            ground.children.forEach(child => createGroundFromTreemap(child, level + 1, buildings, scene));
+        }
     }
 }
+
+
+function hasBuildings(ground, buildings) {
+    return buildings.some(b => b.package === ground.data.label);
+}
+
+
+function isParent(ground) {
+    return Array.isArray(ground.children) && ground.children.length > 0;
+}
+
 
 // Treemap layout function for buildings
 function applyBuildingTreemapLayout(buildings, width, depth) {
@@ -214,7 +280,6 @@ function applyBuildingTreemapLayout(buildings, width, depth) {
 
     return root;
 }
-
 
 // Function to create a ground (district) and add a label
 function createGround(width, depth, color, x, y, z, labelText) {
