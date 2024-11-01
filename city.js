@@ -50,8 +50,8 @@ function init() {
 
 
     const grounds = [
-        { width: 80, depth: 80, label: 'org' },
-        { width: 50, depth: 50, label: 'org.jsoup' },
+        { width: 100, depth: 100, label: 'org' },
+        { width: 80, depth: 80, label: 'org.jsoup' },
         { width: 20, depth: 20, label: 'org.jsoup.nodes' },
         { width: 30, depth: 30, label: 'org.jsoup.select' },
         { width: 20, depth: 20, label: 'org.jsoup.select.1' },
