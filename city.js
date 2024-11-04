@@ -18,7 +18,7 @@ const reservedAreas = {};
 const buildingPositionArray = [];
 
 // Store communication lines here
-const communicationLines = []; 
+const communicationLines = [];
 
 // This should be passed from Java
 const examplePackageName = 'org.jsoup.examples';
@@ -54,16 +54,15 @@ function init() {
 
 
     const grounds = [
-        { width: 100, depth: 100, label: 'org' },
-        { width: 80, depth: 80, label: 'org.jsoup' },
+        { width: 10, depth: 10, label: 'org' },
+        { width: 20, depth: 20, label: 'org.jsoup' },
         { width: 20, depth: 20, label: 'org.jsoup.nodes' },
-        { width: 30, depth: 30, label: 'org.jsoup.select' },
+        { width: 20, depth: 20, label: 'org.jsoup.select' },
         { width: 20, depth: 20, label: 'org.jsoup.select.1' },
         { width: 20, depth: 20, label: 'org.jsoup.safety' },
         { width: 20, depth: 20, label: 'org.jsoup.helper' },
         { width: 20, depth: 20, label: 'org.jsoup.parser' },
-        { width: 25, depth: 25, label: 'org.jsoup.examples' }
-
+        { width: 20, depth: 20, label: 'org.jsoup.examples' }
     ];
 
     const buildings = [
