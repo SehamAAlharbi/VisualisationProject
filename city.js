@@ -54,15 +54,15 @@ function init() {
 
 
     const grounds = [
-        { width: 10, depth: 10, label: 'org' },
-        { width: 20, depth: 20, label: 'org.jsoup' },
-        { width: 20, depth: 20, label: 'org.jsoup.nodes' },
-        { width: 20, depth: 20, label: 'org.jsoup.select' },
-        { width: 20, depth: 20, label: 'org.jsoup.select.1' },
-        { width: 20, depth: 20, label: 'org.jsoup.safety' },
-        { width: 20, depth: 20, label: 'org.jsoup.helper' },
-        { width: 20, depth: 20, label: 'org.jsoup.parser' },
-        { width: 20, depth: 20, label: 'org.jsoup.examples' }
+        { scaleX: 10, scaleZ: 10, label: 'org' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.nodes' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select.1' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.safety' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.helper' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.parser' },
+        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.examples' }
     ];
 
     const buildings = [
@@ -220,7 +220,7 @@ function buildPackageHierarchy(grounds) {
 // Apply D3 treemap layout to assign positions within parent bounds
 function applyTreemapLayout(rootNode) {
     const root = d3.hierarchy(rootNode)
-        .sum(d => d.width * d.depth)
+        .sum(d => d.scaleX * d.scaleZ)
         .sort((a, b) => b.value - a.value);
 
     d3.treemap()
