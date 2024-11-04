@@ -3,6 +3,7 @@ import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import { KMZLoader } from 'jsm/loaders/KMZLoader.js';
 import { FontLoader } from "jsm/loaders/FontLoader.js";
 import { TextGeometry } from "jsm/geometries/TextGeometry.js";
+
 // Using D3.js Treemap layout to position (x,y,z) of districts and buildings correctly and dynamically without overlapping
 import * as d3 from "d3";
 
@@ -15,6 +16,9 @@ const reservedAreas = {};
 
 // To track buildings positions as they are being added dynamically, to be used for connection lines later
 const buildingPositionArray = [];
+
+// Store communication lines here
+const communicationLines = []; 
 
 // This should be passed from Java
 const examplePackageName = 'org.jsoup.examples';
@@ -105,6 +109,12 @@ function init() {
 
     // Resize event listener
     window.addEventListener('resize', onWindowResize);
+
+    // Add GUI for toggling communication lines
+    const gui = new lil.GUI();
+    const settings = { hideCommunicationLines: false };
+    gui.add(settings, 'hideCommunicationLines').name('Hide Communication Lines').onChange(toggleCommunicationLines);
+
 }
 
 // function to create communication lines between buildings 
@@ -122,13 +132,15 @@ function createConnections() {
                     const curveHeight = 25 + Math.random() * 10;
 
                     // Create a communication line between the current building and the target building
-                    createCommunicationLine(
+                    const communicationLine = createCommunicationLine(
                         new THREE.Vector3(building.position.x, building.position.y, building.position.z),
                         new THREE.Vector3(targetBuilding.position.x, targetBuilding.position.y, targetBuilding.position.z),
                         curveHeight,
                         labelText,
                         building.color
                     );
+
+                    communicationLines.push(communicationLine);
                 } else {
                     console.warn(`Connection target '${connectionLabel}' for building '${building.label}' not found.`);
                 }
@@ -162,6 +174,15 @@ function createCommunicationLine(start, end, curveHeight, label, color) {
     addHoverLabel(label, tube);
 
     scene.add(tube);
+
+    return tube;
+}
+
+// Function to toggle visibility of communication lines
+function toggleCommunicationLines(isHidden) {
+    communicationLines.forEach(line => {
+        line.visible = !isHidden;
+    });
 }
 
 
