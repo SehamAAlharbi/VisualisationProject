@@ -54,30 +54,35 @@ function init() {
 
 
     const grounds = [
-        { scaleX: 10, scaleZ: 10, label: 'org' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup' },
+        { scaleX: 20, scaleZ: 20, label: 'org' },
+        { scaleX: 40, scaleZ: 40, label: 'org.jsoup' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.nodes' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select.1' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.safety' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.helper' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.parser' },
+        { scaleX: 10, scaleZ: 10, label: 'org.jsoup.parser' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.examples' }
     ];
 
     const buildings = [
-        { label: 'Attribute', scaleX: 3, scaleY: 3, scaleZ: 20, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'] },
-        { label: 'UncheckedIOException', scaleX: 1, scaleY: 1, scaleZ: 10, color: getRandomColor(), package: 'org.jsoup', connections: ['1', '2'] },
-        { label: 'Document', scaleX: 2, scaleY: 2, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [] },
-        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '3', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '4', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '5', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: 'Node', scaleX: 2, scaleY: 2, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1'] },
-        { label: '1', scaleX: 4, scaleY: 4, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples', connections: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples', connections: [] }
+        { label: 'Attribute', scaleX: 1, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'] },
+        { label: 'UncheckedIOException', scaleX: 2, scaleY: 10, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup', connections: ['1', '2'] },
+        { label: 'Document', scaleX: 5, scaleY: 20, scaleZ: 5, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [] },
+        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '5', scaleX: 4, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: '5', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
+        { label: 'Node', scaleX: 4, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1'] },
+        { label: '1', scaleX: 4, scaleY: 4, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples', connections: [] },
+        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples', connections: [] }
     ];
 
     // Use treemap from D3.js
@@ -113,6 +118,8 @@ function init() {
     const gui = new lil.GUI();
     const settings = { hideCommunicationLines: false };
     gui.add(settings, 'hideCommunicationLines').name('Hide Communication Lines').onChange(toggleCommunicationLines);
+
+    render();
 
 }
 
@@ -182,6 +189,7 @@ function toggleCommunicationLines(isHidden) {
     communicationLines.forEach(line => {
         line.visible = !isHidden;
     });
+    render();
 }
 
 
@@ -312,7 +320,7 @@ function createGroundFromTreemap(ground, level, buildings, scene) {
             const posY = y + 0.5;
             const posZ = currentZ + buildingDepth / 2;
 
-            createBuilding(new KMZLoader(), building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
+            createBuilding(building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
 
             // Push building information to the global positionsArray
             buildingPositionArray.push({
@@ -340,10 +348,6 @@ function createGroundFromTreemap(ground, level, buildings, scene) {
             ground.children.forEach(child => createGroundFromTreemap(child, level + 1, buildings, scene));
         }
     }
-}
-
-function hasBuildings(ground, buildings) {
-    return buildings.some(b => b.package === ground.data.label);
 }
 
 function isParent(ground) {
@@ -394,7 +398,7 @@ function createBuildingFromData(buildingData, groundX, groundY, groundZ, width, 
     const posZ = groundZ + (y0 + y1) / 2 - depth / 2;
     const posY = groundY + 0.5;
 
-    createBuilding(new KMZLoader(), building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
+    createBuilding(building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
 
     // Push building information to the global positionsArray
     buildingPositionArray.push({
@@ -407,28 +411,22 @@ function createBuildingFromData(buildingData, groundX, groundY, groundZ, width, 
 }
 
 // Function to load a cube (building) with a hoverable label, pos is where the building is on the grid, scale is the size of the buidng where y is length, x is width, and z is height
-function createBuilding(loader, label, posX, posY, posZ, scaleX, scaleY, scaleZ, color) {
-    loader.load('./examples_models_kmz_Box.kmz', function (kmz) {
-        kmz.scene.position.set(posX, posY + scaleZ / 2, posZ);
-        // So the building stays on the ground surface the scale.z should be doubled the value of posY
-        kmz.scene.scale.set(scaleX, scaleY, scaleZ);
-        scene.add(kmz.scene);
+function createBuilding(label, posX, posY, posZ, scaleX, scaleY, scaleZ, color) {
+    // Create a Box geometry with the provided scale values
+    const geometry = new THREE.BoxGeometry(scaleX, scaleY, scaleZ);
+    const material = new THREE.MeshStandardMaterial({ color: color });
+    const box = new THREE.Mesh(geometry, material);
 
-        kmz.scene.traverse(function (child) {
-            if (child.isMesh) {
-                child.castShadow = true;
-                if (child.material) {
-                    child.material.color.set(color);
-                }
-            }
-        });
+    // Adjust box position to sit directly on the ground
+    const offset = 0.3; // Try values like 0.01, 0.05, or 0.1 if needed
+    box.position.set(posX, posY + (scaleY / 2) - offset, posZ);
+    box.castShadow = true;
 
-        // Add a hoverable label
-        addHoverLabel(label, kmz.scene);
+    // Add the box to the scene
+    scene.add(box);
 
-        // Render the scene after building is added
-        render();
-    });
+    // Add a hoverable label
+    addHoverLabel(label, box);
 }
 
 // Function to add a hoverable label to a cube
