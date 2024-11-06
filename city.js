@@ -54,7 +54,7 @@ function init() {
 
 
     const grounds = [
-        { scaleX: 20, scaleZ: 20, label: 'org' },
+
         { scaleX: 40, scaleZ: 40, label: 'org.jsoup' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.nodes' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select' },
@@ -66,23 +66,23 @@ function init() {
     ];
 
     const buildings = [
-        { label: 'Attribute', scaleX: 1, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'] },
-        { label: 'UncheckedIOException', scaleX: 2, scaleY: 10, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup', connections: ['1', '2'] },
-        { label: 'Document', scaleX: 5, scaleY: 20, scaleZ: 5, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [] },
-        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '5', scaleX: 4, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: '5', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [] },
-        { label: 'Node', scaleX: 4, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1'] },
-        { label: '1', scaleX: 4, scaleY: 4, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples', connections: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples', connections: [] }
+        { label: 'Attribute', scaleX: 1, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'], lineText: ['hi', 'bey'] },
+        { label: 'UncheckedIOException', scaleX: 2, scaleY: 10, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup', connections: ['1', '2'], lineText: [] },
+        { label: 'Document', scaleX: 5, scaleY: 20, scaleZ: 5, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
+        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '5', scaleX: 4, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: '5', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
+        { label: 'Node', scaleX: 4, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1'], lineText: [] },
+        { label: '1', scaleX: 4, scaleY: 4, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
+        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] }
     ];
 
     // Use treemap from D3.js
@@ -127,14 +127,18 @@ function init() {
 function createConnections() {
     buildingPositionArray.forEach(building => {
         if (building.connections && building.connections.length > 0) {
-            building.connections.forEach(connectionLabel => {
+            building.connections.forEach((connectionLabel, index) => {
+                // Ensure connectionLabel is defined within the loop
+                if (!connectionLabel) return;
+
                 // Find the target building with the matching label
                 const targetBuilding = buildingPositionArray.find(b => b.label === connectionLabel && b.package === examplePackageName);
 
                 if (targetBuilding) {
-                    const labelText = 'Connecting ' + building.label + ' to ' + targetBuilding.label;
+                    // Get the label text based on the index
+                    const lineText = building.lineText[index] || "";
 
-                    // Randomise the curve height slightly for each line, so they do not appear as one line
+                    // Randomize the curve height slightly for each line, so they do not appear as one line
                     const curveHeight = 25 + Math.random() * 10;
 
                     // Create a communication line between the current building and the target building
@@ -142,7 +146,7 @@ function createConnections() {
                         new THREE.Vector3(building.position.x, building.position.y, building.position.z),
                         new THREE.Vector3(targetBuilding.position.x, targetBuilding.position.y, targetBuilding.position.z),
                         curveHeight,
-                        labelText,
+                        lineText,
                         building.color
                     );
 
@@ -154,6 +158,7 @@ function createConnections() {
         }
     });
 }
+
 
 // Function to create communication lines between cubes
 function createCommunicationLine(start, end, curveHeight, label, color) {
@@ -233,7 +238,7 @@ function applyTreemapLayout(rootNode) {
 
     d3.treemap()
         // Fixed layout size for consistent centering
-        .size([100, 100])
+        .size([150, 150])
         .padding(1)
         .round(true)(root);
 
@@ -328,6 +333,7 @@ function createGroundFromTreemap(ground, level, buildings, scene) {
                 package: building.package,
                 position: { x: posX, y: posY, z: posZ },
                 connections: building.connections || [],
+                lineText: building.lineText || [],
                 color: building.color
             });
 
@@ -387,7 +393,7 @@ function createGround(width, depth, color, x, y, z, labelText) {
     const labelZ = z + depth / 2.1;
     const labelY = y + 0.2;
 
-    addGroundLabel(labelText, labelX, labelY, labelZ, 0.8);
+    addGroundLabel(labelText, labelX, labelY, labelZ, 1.5);
 }
 
 // Helper function to create a building dynamically positioned within ground bounds
@@ -406,6 +412,7 @@ function createBuildingFromData(buildingData, groundX, groundY, groundZ, width, 
         package: building.package,
         position: { x: posX, y: posY, z: posZ },
         connections: building.connections || [],
+        lineText: building.lineText || [],
         color: building.color
     });
 }
