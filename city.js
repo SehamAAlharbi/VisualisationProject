@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
-import { KMZLoader } from 'jsm/loaders/KMZLoader.js';
 import { FontLoader } from "jsm/loaders/FontLoader.js";
 import { TextGeometry } from "jsm/geometries/TextGeometry.js";
 
@@ -66,7 +65,7 @@ function init() {
     ];
 
     const buildings = [
-        { label: 'Attribute', scaleX: 1, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'], lineText: ['hi', 'bey'] },
+        { label: 'Attribute', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'], lineText: ['hi', 'bey'] },
         { label: 'UncheckedIOException', scaleX: 2, scaleY: 10, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup', connections: ['1', '2'], lineText: [] },
         { label: 'Document', scaleX: 5, scaleY: 20, scaleZ: 5, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
         { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
