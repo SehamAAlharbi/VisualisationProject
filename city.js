@@ -57,7 +57,7 @@ function init() {
         { scaleX: 40, scaleZ: 40, label: 'org.jsoup' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.nodes' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select.1' },
+        { scaleX: 10, scaleZ: 10, label: 'org.jsoup.select.1' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.safety' },
         { scaleX: 20, scaleZ: 20, label: 'org.jsoup.helper' },
         { scaleX: 10, scaleZ: 10, label: 'org.jsoup.parser' },
