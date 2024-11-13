@@ -40,7 +40,7 @@ function init() {
     scene.add(ambientLight);
 
     // Camera setup
-    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 500);
+    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
     // Lift the camera higher to see both cubes and ground clearly
     camera.position.y = 10;
     camera.position.z = 20;
@@ -48,51 +48,66 @@ function init() {
     scene.add(camera);
 
     // Create a grid helper to show the grid on the ground
-    const grid = new THREE.GridHelper(150, 150, 0xffffff, 0xc3c7c7);
+    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xc3c7c7);
     scene.add(grid);
 
+    // Grounds width and depth are set to 0 for now, the function calculateGroundSizes will determine them dynamically based on their buildings and chaild ground sizes.
+   // Grounds array
+const grounds = [
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.examples' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.helper' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.nodes' }
+];
 
-    const grounds = [
+// Buildings array
+const buildings = [
+    { label: 'HtmlToPlainText', scaleX: 2.0, scaleY: 1.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
+    { label: 'Wikipedia', scaleX: 2.0, scaleY: 1.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
+    { label: 'MyOwnExample', scaleX: 2.0, scaleY: 10.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
+    { label: 'ListLinks', scaleX: 2.0, scaleY: 3.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
 
-        { scaleX: 40, scaleZ: 40, label: 'org.jsoup' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.nodes' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.select' },
-        { scaleX: 10, scaleZ: 10, label: 'org.jsoup.select.1' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.safety' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.helper' },
-        { scaleX: 10, scaleZ: 10, label: 'org.jsoup.parser' },
-        { scaleX: 20, scaleZ: 20, label: 'org.jsoup.examples' }
-    ];
+    // org.jsoup buildings
+    { label: 'UncheckedIOException', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: 'Method', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
+    { label: 'Method1', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
 
-    const buildings = [
-        { label: 'Attribute', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1', '2'], lineText: ['hi', 'bey'] },
-        { label: 'UncheckedIOException', scaleX: 2, scaleY: 10, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup', connections: ['1', '2'], lineText: [] },
-        { label: 'Document', scaleX: 5, scaleY: 20, scaleZ: 5, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
-        { label: 'DataNode', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '5', scaleX: 4, scaleY: 1, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '1', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '3', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '4', scaleX: 1, scaleY: 3, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: '5', scaleX: 2, scaleY: 1, scaleZ: 2, color: getRandomColor(), package: 'org.jsoup.select.1', connections: [], lineText: [] },
-        { label: 'Node', scaleX: 4, scaleY: 10, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.nodes', connections: ['1'], lineText: [] },
-        { label: '1', scaleX: 4, scaleY: 4, scaleZ: 4, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
-        { label: '2', scaleX: 1, scaleY: 1, scaleZ: 1, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] }
-    ];
+    // org.jsoup.nodes buildings
+    { label: 'Element', scaleX: 10.0, scaleY: 6.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup.nodes', 
+      connections: ['ListLinks', 'HtmlToPlainText', 'Wikipedia', 'MyOwnExample'], 
+      lineText: [
+        'REFERENCE: Line 26', 'REFERENCE: Line 36', 'REFERENCE: Line 41', 'INVOCATION: Line 42', 
+        'REFERENCE: Line 46', 'REFERENCE: Line 61', 'REFERENCE: Line 19', 'INHERITANCE: Line 19', 
+        'INSTANTIATION: Line 62', 'INSTANTIATION: Line 63', 'REFERENCE: Line 62', 'REFERENCE: Line 63', 
+        'INVOCATION: Line 62', 'INVOCATION: Line 63', 'OVERRIDING: Line 29', 'INVOCATION: Line 31'
+      ]
+    },
+    { label: 'DocumentType', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
+
+    // org.jsoup.helper buildings
+    { label: 'DataUtil', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.helper', connections: [], lineText: [] }
+];
+
+
+
+    console.log("grounds:", grounds);  // Check if grounds is defined and an array
+    console.log("buildings:", buildings);
+
+    // determine ground size
+    // Example usage before applying treemap layout
+    calculateGroundSizes(grounds, buildings);
+
+
 
     // Use treemap from D3.js
     const hierarchyGroundsData = buildPackageHierarchy(grounds);
-    const layoutGroundsData = applyTreemapLayout(hierarchyGroundsData);
+    const layoutGroundsData = applyTreemapLayout(hierarchyGroundsData, grounds);
     centerLayout(layoutGroundsData);
 
     // Recursively create all grounds in the scene
     createGroundFromTreemap(layoutGroundsData, 0, buildings, scene);
 
-    // Create communication lines between the buildings
+    // Create connections lines between the buildings
     createConnections();
 
     // Renderer setup
@@ -116,10 +131,52 @@ function init() {
     // Add GUI for toggling communication lines
     const gui = new lil.GUI();
     const settings = { hideCommunicationLines: false };
-    gui.add(settings, 'hideCommunicationLines').name('Hide Communication Lines').onChange(toggleCommunicationLines);
+    gui.add(settings, 'hideCommunicationLines').name('Hide Connections Lines').onChange(toggleCommunicationLines);
 
     render();
 
+}
+
+// dynamic calculation to calculate ground sizes based on building sizes and child grounds
+function calculateGroundSizes(grounds, buildings) {
+    // Create a map for quick access to buildings based on their package/ground label
+    const buildingsByGround = buildings.reduce((map, building) => {
+        if (!map[building.package]) map[building.package] = [];
+        map[building.package].push(building);
+        return map;
+    }, {});
+
+    // Define a minimum size for visibility, adjust as needed
+    const minSize = 2.0;
+
+    // Recursive function to calculate area requirements for grounds and their children
+    function calculateAreaForGround(ground) {
+        let area = 0;
+
+        // Add area for buildings directly associated with this ground
+        const groundBuildings = buildingsByGround[ground.label] || [];
+        groundBuildings.forEach(building => {
+            area += building.scaleX * building.scaleZ;
+        });
+
+        // If the ground has child grounds, recursively add their areas
+        if (ground.children) {
+            ground.children.forEach(child => {
+                const childArea = calculateAreaForGround(child);
+                area += childArea;
+            });
+        }
+
+        // Set scaleX and scaleZ based on the calculated area
+        // Use Math.max to ensure a minimum size for visibility
+        ground.scaleX = Math.max(Math.sqrt(area), minSize);
+        ground.scaleZ = Math.max(Math.sqrt(area), minSize);
+
+        return area;
+    }
+
+    // Calculate area and sizes for each top-level ground
+    grounds.forEach(ground => calculateAreaForGround(ground));
 }
 
 // function to create communication lines between buildings 
@@ -229,20 +286,38 @@ function buildPackageHierarchy(grounds) {
     return root;
 }
 
-// Apply D3 treemap layout to assign positions within parent bounds
-function applyTreemapLayout(rootNode) {
+// Apply D3 treemap layout to assign positions within parent bounds.
+// Each entry in the grounds array includes scaleX and scaleZ values, which act as relative weights for the layout sizing. These values indirectly impact how much space each ground occupies in the final layout, as D3's treemap algorithm will consider them when calculating the area for each ground.
+function applyTreemapLayout(rootNode, grounds) {
+    // Calculate total area needed based on grounds' scaleX and scaleZ
+    const totalArea = grounds.reduce((sum, ground) => sum + ground.scaleX * ground.scaleZ, 0);
+
+    // Set a scaling factor to determine compactness; adjust as needed
+    const scalingFactor = 10;
+
+    // Calculate the side length of the layout area dynamically
+    const sideLength = Math.sqrt(totalArea) * scalingFactor;
+
+    // Define minimum and maximum layout size to keep visual consistency
+    const minSize = 100;  // minimum side length
+    const maxSize = 300;  // maximum side length
+
+    // Ensure the side length stays within the min and max size range
+    const layoutSize = Math.max(minSize, Math.min(maxSize, sideLength));
+
+    // Create a D3 treemap layout with dynamic size
     const root = d3.hierarchy(rootNode)
         .sum(d => d.scaleX * d.scaleZ)
         .sort((a, b) => b.value - a.value);
 
     d3.treemap()
-        // Fixed layout size for consistent centering
-        .size([150, 150])
+        .size([layoutSize, layoutSize])  // Set the dynamic layout size here
         .padding(1)
         .round(true)(root);
 
     return root;
 }
+
 
 function centerLayout(root) {
     let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
