@@ -10,9 +10,6 @@ let camera, scene, renderer;
 
 const colors = [0x78A8B8, 0xa7cfcb, 0x63392c, 0xf7b29c, 0xf5d9c1];
 
-// Global object to track reserved areas for each parent ground
-const reservedAreas = {};
-
 // To track buildings positions as they are being added dynamically, to be used for connection lines later
 const buildingPositionArray = [];
 
@@ -57,7 +54,12 @@ const grounds = [
     { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup' },
     { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.examples' },
     { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.helper' },
-    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.nodes' }
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.1' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.2' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.3' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.4' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.nodes' },
+    { scaleX: 0.0, scaleZ: 0.0, label: 'org.jsoup.nodes.1' }
 ];
 
 // Buildings array
@@ -67,8 +69,28 @@ const buildings = [
     { label: 'MyOwnExample', scaleX: 2.0, scaleY: 10.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
     { label: 'ListLinks', scaleX: 2.0, scaleY: 3.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
 
+    { label: 'HtmlToPlainText', scaleX: 10.0, scaleY: 1.0, scaleZ: 5.0, color: getRandomColor(), package: 'org.jsoup.1', connections: [], lineText: [] },
+    { label: 'Wikipedia', scaleX: 5.0, scaleY: 1.0, scaleZ: 6.0, color: getRandomColor(), package: 'org.jsoup.2', connections: [], lineText: [] },
+    { label: 'MyOwnExample', scaleX: 10.0, scaleY: 10.0, scaleZ: 7.0, color: getRandomColor(), package: 'org.jsoup.3', connections: [], lineText: [] },
+    { label: 'ListLinks', scaleX: 2.0, scaleY: 3.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.4', connections: [], lineText: [] },
+
     // org.jsoup buildings
-    { label: 'UncheckedIOException', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '1', scaleX: 10.0, scaleY: 5.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '2', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '3', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '4', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '5', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '6', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '7', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+
+    { label: '1', scaleX: 10.0, scaleY: 5.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '2', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '3', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '4', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '5', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '6', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: '7', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+
     { label: 'Method', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
     { label: 'Method1', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
 
@@ -82,10 +104,14 @@ const buildings = [
         'INVOCATION: Line 62', 'INVOCATION: Line 63', 'OVERRIDING: Line 29', 'INVOCATION: Line 31'
       ]
     },
+    { label: 'DocumentType', scaleX: 10.0, scaleY: 1.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup.nodes.1', connections: [], lineText: [] },
+    { label: 'DocumentType', scaleX: 4.0, scaleY: 1.0, scaleZ: 8.0, color: getRandomColor(), package: 'org.jsoup.nodes.1', connections: [], lineText: [] },
+    { label: 'DocumentType', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.nodes.1', connections: [], lineText: [] },
+    { label: 'DocumentType', scaleX: 10.0, scaleY: 1.0, scaleZ: 5.0, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
     { label: 'DocumentType', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
 
     // org.jsoup.helper buildings
-    { label: 'DataUtil', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.helper', connections: [], lineText: [] }
+    { label: 'DataUtil', scaleX: 5.0, scaleY: 5.0, scaleZ: 5.0, color: getRandomColor(), package: 'org.jsoup.helper', connections: [], lineText: [] }
 ];
 
 
@@ -341,67 +367,92 @@ function centerLayout(root) {
 
 // Recursive function to position and render grounds based on treemap data
 function createGroundFromTreemap(ground, level, buildings, scene) {
-    const { x0, y0, x1, y1 } = ground;
+    const { x0, y0, x1, y1 } = ground; // Boundaries of the ground
     const width = x1 - x0;
     const depth = y1 - y0;
-    const x = x0 + width / 2;
-    const z = y0 + depth / 2;
-    const y = level * 0.4;
+    const centerX = x0 + width / 2;
+    const centerZ = y0 + depth / 2;
+    const y = level * 0.4; // Height layer for the ground
 
-    const lightness = Math.max(100 - level * 15, 0);
+    // Create the ground (visual representation)
+    const lightness = Math.max(100 - level * 15, 0); // Adjust lightness for each level
     const color = new THREE.Color(`hsl(0, 0%, ${lightness}%)`);
     const label = ground.data?.label ? ground.data.label.split('.').pop() : "";
 
-    createGround(width, depth, color, x, y, z, label);
+    createGround(width, depth, color, centerX, y, centerZ, label);
 
-    if (isParent(ground)) {
-        // Initialize reserved area for the parent ground
-        reservedAreas[ground.data.label] = { x: x0, z: y0, width: width, depth: depth, usedX: x0, usedZ: y0 };
+    // Filter buildings for this ground
+    const parentBuildings = buildings.filter(b => b.package === ground.data.label);
 
-        // Place child grounds and reserve their spaces
+    // Track the area occupied by child grounds
+    let occupiedArea = [];
+
+    // Handle child grounds recursively
+    if (ground.children && ground.children.length > 0) {
         ground.children.forEach(child => {
             createGroundFromTreemap(child, level + 1, buildings, scene);
 
-            // After placing child grounds, update the reserved area
-            const childWidth = child.x1 - child.x0;
-            const childDepth = child.y1 - child.y0;
-
-            // Add some padding
-            reservedAreas[ground.data.label].usedX += childWidth + 1;
-
-            // Reset X and move Z down when exceeding parent width
-            if (reservedAreas[ground.data.label].usedX + childWidth > x1) {
-                reservedAreas[ground.data.label].usedX = x0;
-                reservedAreas[ground.data.label].usedZ += childDepth + 1;
-            }
+            // Add the child ground's occupied area to the tracker
+            occupiedArea.push({
+                x0: child.x0,
+                x1: child.x1,
+                y0: child.y0,
+                y1: child.y1
+            });
         });
+    }
 
-        // Place parent buildings in the remaining space within the reserved area
-        const parentBuildings = buildings.filter(b => b.package === ground.data.label);
-        let currentX = reservedAreas[ground.data.label].usedX;
-        let currentZ = reservedAreas[ground.data.label].usedZ;
-        const buildingPadding = 0.5;
+    // Add a small padding between buildings
+    const buildingPadding = 0.5; // Increase this value to increase spacing
+
+    // Place parent buildings in the remaining unoccupied space
+    if (parentBuildings.length > 0) {
+        let currentX = x0; // Start at the left edge of the ground
+        let currentZ = y0; // Start at the top edge of the ground
 
         parentBuildings.forEach(building => {
-            const buildingWidth = building.scaleX;
-            const buildingDepth = building.scaleZ;
+            const buildingWidth = building.scaleX + buildingPadding; // Add padding to the building width
+            const buildingDepth = building.scaleZ + buildingPadding; // Add padding to the building depth
 
-            // Ensure the building is within the reserved area boundaries
-            if (currentX + buildingWidth > x1) {
-                // Reset to start of row
-                currentX = x0;
-                // Move down for a new row
-                currentZ += buildingDepth + buildingPadding;
+            // Check for overlap with occupied child areas
+            while (true) {
+                const overlaps = occupiedArea.some(area => {
+                    return (
+                        currentX < area.x1 &&
+                        currentX + buildingWidth > area.x0 &&
+                        currentZ < area.y1 &&
+                        currentZ + buildingDepth > area.y0
+                    );
+                });
+
+                // If there's an overlap, move the building to the right or down
+                if (overlaps) {
+                    currentX += buildingWidth; // Move to the right
+                    if (currentX + buildingWidth > x1) {
+                        currentX = x0; // Reset to the left
+                        currentZ += buildingDepth; // Move down
+                    }
+                } else {
+                    // No overlap, position is valid
+                    break;
+                }
             }
 
-            // Position the building
-            const posX = currentX + buildingWidth / 2;
-            const posY = y + 0.5;
-            const posZ = currentZ + buildingDepth / 2;
+            // Ensure buildings do not exceed the parent ground's boundaries
+            if (currentX + buildingWidth > x1 || currentZ + buildingDepth > y1) {
+                console.warn(`Building ${building.label} cannot be placed: insufficient space in ground ${ground.data.label}`);
+                return;
+            }
 
+            // Calculate the building's position
+            const posX = currentX + buildingWidth / 2 - buildingPadding / 2; // Adjust for padding
+            const posY = y + 0.5; // Slightly above ground level
+            const posZ = currentZ + buildingDepth / 2 - buildingPadding / 2; // Adjust for padding
+
+            // Create the building
             createBuilding(building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
 
-            // Push building information to the global positionsArray
+            // Save the building position globally
             buildingPositionArray.push({
                 label: building.label,
                 package: building.package,
@@ -411,43 +462,16 @@ function createGroundFromTreemap(ground, level, buildings, scene) {
                 color: building.color
             });
 
-            // Update current position
-            currentX += buildingWidth + buildingPadding;
+            // Update position for the next building
+            currentX += buildingWidth; // Include padding in position update
+            if (currentX + buildingWidth > x1) {
+                currentX = x0; // Reset to the left
+                currentZ += buildingDepth; // Move down
+            }
         });
-    } else {
-        // Handle leaf grounds without children/othergrounds on top of them
-        const groundBuildings = buildings.filter(b => b.package === ground.data.label);
-        if (groundBuildings.length > 0) {
-            const layoutBuildingsData = applyBuildingTreemapLayout(groundBuildings, width, depth);
-            layoutBuildingsData.children.forEach(buildingData => {
-                createBuildingFromData(buildingData, x, y, z, width, depth);
-            });
-        }
-
-        if (ground.children) {
-            ground.children.forEach(child => createGroundFromTreemap(child, level + 1, buildings, scene));
-        }
     }
 }
 
-function isParent(ground) {
-    return Array.isArray(ground.children) && ground.children.length > 0;
-}
-
-
-// Treemap layout function for buildings
-function applyBuildingTreemapLayout(buildings, width, depth) {
-    const root = d3.hierarchy({ children: buildings })
-        // Summing area as the product of width and depth
-        .sum(d => d.scaleX * d.scaleZ)
-        .sort((a, b) => b.value - a.value);
-
-    d3.treemap()
-        .size([width, depth])
-        .padding(1)(root);
-
-    return root;
-}
 
 // Function to create a ground (district) and add a label
 function createGround(width, depth, color, x, y, z, labelText) {
@@ -468,27 +492,6 @@ function createGround(width, depth, color, x, y, z, labelText) {
     const labelY = y + 0.2;
 
     addGroundLabel(labelText, labelX, labelY, labelZ, 1.5);
-}
-
-// Helper function to create a building dynamically positioned within ground bounds
-function createBuildingFromData(buildingData, groundX, groundY, groundZ, width, depth) {
-    const { x0, y0, x1, y1 } = buildingData;
-    const building = buildingData.data;
-    const posX = groundX + (x0 + x1) / 2 - width / 2;
-    const posZ = groundZ + (y0 + y1) / 2 - depth / 2;
-    const posY = groundY + 0.5;
-
-    createBuilding(building.label, posX, posY, posZ, building.scaleX, building.scaleY, building.scaleZ, building.color);
-
-    // Push building information to the global positionsArray
-    buildingPositionArray.push({
-        label: building.label,
-        package: building.package,
-        position: { x: posX, y: posY, z: posZ },
-        connections: building.connections || [],
-        lineText: building.lineText || [],
-        color: building.color
-    });
 }
 
 // Function to load a cube (building) with a hoverable label, pos is where the building is on the grid, scale is the size of the buidng where y is length, x is width, and z is height
