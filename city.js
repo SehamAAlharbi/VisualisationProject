@@ -337,7 +337,7 @@ function applyTreemapLayout(rootNode, grounds) {
         .sort((a, b) => b.value - a.value);
 
     d3.treemap()
-        .size([layoutSize, layoutSize])  // Set the dynamic layout size here
+        .size([layoutSize, layoutSize])  
         .padding(1)
         .round(true)(root);
 
@@ -411,8 +411,8 @@ function createGroundFromTreemap(ground, level, buildings, scene) {
         let currentZ = y0; // Start at the top edge of the ground
 
         parentBuildings.forEach(building => {
-            const buildingWidth = building.scaleX + buildingPadding; // Add padding to the building width
-            const buildingDepth = building.scaleZ + buildingPadding; // Add padding to the building depth
+            const buildingWidth = building.scaleX + buildingPadding; 
+            const buildingDepth = building.scaleZ + buildingPadding;
 
             // Check for overlap with occupied child areas
             while (true) {
