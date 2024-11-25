@@ -64,54 +64,20 @@ const grounds = [
 
 // Buildings array
 const buildings = [
-    { label: 'HtmlToPlainText', scaleX: 2.0, scaleY: 1.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
-    { label: 'Wikipedia', scaleX: 2.0, scaleY: 1.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
-    { label: 'MyOwnExample', scaleX: 2.0, scaleY: 10.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
-    { label: 'ListLinks', scaleX: 2.0, scaleY: 3.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.examples', connections: [], lineText: [] },
-
-    { label: 'HtmlToPlainText', scaleX: 10.0, scaleY: 1.0, scaleZ: 5.0, color: getRandomColor(), package: 'org.jsoup.1', connections: [], lineText: [] },
-    { label: 'Wikipedia', scaleX: 5.0, scaleY: 1.0, scaleZ: 6.0, color: getRandomColor(), package: 'org.jsoup.2', connections: [], lineText: [] },
-    { label: 'MyOwnExample', scaleX: 10.0, scaleY: 10.0, scaleZ: 7.0, color: getRandomColor(), package: 'org.jsoup.3', connections: [], lineText: [] },
-    { label: 'ListLinks', scaleX: 2.0, scaleY: 3.0, scaleZ: 2.0, color: getRandomColor(), package: 'org.jsoup.4', connections: [], lineText: [] },
+    { label: 'HtmlToPlainText', scaleX: 2.0, scaleY: 0.5, scaleZ: 2.0, color: getColorForScaleY(0.5), package: 'org.jsoup.examples', connections: [], lineText: [] },
+    { label: 'Wikipedia', scaleX: 2.0, scaleY: 1.0, scaleZ: 2.0, color: getColorForScaleY(1), package: 'org.jsoup.examples', connections: [], lineText: [] },
+    { label: 'MyOwnExample', scaleX: 2.0, scaleY: 10.0, scaleZ: 2.0, color: getColorForScaleY(10), package: 'org.jsoup.examples', connections: [], lineText: [] },
+    { label: 'ListLinks', scaleX: 2.0, scaleY: 3.0, scaleZ: 2.0, color: getColorForScaleY(3), package: 'org.jsoup.examples', connections: [], lineText: [] },
 
     // org.jsoup buildings
-    { label: '1', scaleX: 10.0, scaleY: 5.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '2', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '3', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '4', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '5', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '6', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '7', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
+    { label: 'Method', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getColorForScaleY(100), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
+   
 
-    { label: '1', scaleX: 10.0, scaleY: 5.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '2', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '3', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '4', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '5', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '6', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-    { label: '7', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup', connections: [], lineText: [] },
-
-    { label: 'Method', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
-    { label: 'Method1', scaleX: 10.0, scaleY: 10.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup', connections: ['MyOwnExample'], lineText: ['READ: Line 55', 'REFERENCE: Line 43', 'REFERENCE: Line 45', 'REFERENCE: Line 43', 'REFERENCE: Line 45'] },
-
-    // org.jsoup.nodes buildings
-    { label: 'Element', scaleX: 10.0, scaleY: 6.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup.nodes', 
-      connections: ['ListLinks', 'HtmlToPlainText', 'Wikipedia', 'MyOwnExample'], 
-      lineText: [
-        'REFERENCE: Line 26', 'REFERENCE: Line 36', 'REFERENCE: Line 41', 'INVOCATION: Line 42', 
-        'REFERENCE: Line 46', 'REFERENCE: Line 61', 'REFERENCE: Line 19', 'INHERITANCE: Line 19', 
-        'INSTANTIATION: Line 62', 'INSTANTIATION: Line 63', 'REFERENCE: Line 62', 'REFERENCE: Line 63', 
-        'INVOCATION: Line 62', 'INVOCATION: Line 63', 'OVERRIDING: Line 29', 'INVOCATION: Line 31'
-      ]
-    },
-    { label: 'DocumentType', scaleX: 10.0, scaleY: 1.0, scaleZ: 10.0, color: getRandomColor(), package: 'org.jsoup.nodes.1', connections: [], lineText: [] },
-    { label: 'DocumentType', scaleX: 4.0, scaleY: 1.0, scaleZ: 8.0, color: getRandomColor(), package: 'org.jsoup.nodes.1', connections: [], lineText: [] },
-    { label: 'DocumentType', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.nodes.1', connections: [], lineText: [] },
-    { label: 'DocumentType', scaleX: 10.0, scaleY: 1.0, scaleZ: 5.0, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
-    { label: 'DocumentType', scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0, color: getRandomColor(), package: 'org.jsoup.nodes', connections: [], lineText: [] },
+    { label: 'DocumentType_1', scaleX: 10.0, scaleY: 1.0, scaleZ: 10.0, color: getColorForScaleY(1), package: 'org.jsoup.nodes', connections: [], lineText: [] },
+    { label: 'DocumentType_2', scaleX: 10.0, scaleY: 80, scaleZ: 10.0, color: getColorForScaleY(80), package: 'org.jsoup.nodes', connections: [], lineText: [] },
 
     // org.jsoup.helper buildings
-    { label: 'DataUtil', scaleX: 5.0, scaleY: 5.0, scaleZ: 5.0, color: getRandomColor(), package: 'org.jsoup.helper', connections: [], lineText: [] }
+    { label: 'DataUtil', scaleX: 5.0, scaleY: 50.0, scaleZ: 5.0, color: getColorForScaleY(50), package: 'org.jsoup.helper', connections: [], lineText: [] }
 ];
 
 
@@ -280,9 +246,25 @@ function toggleCommunicationLines(isHidden) {
 }
 
 
-function getRandomColor() {
-    return colors[Math.floor(Math.random() * colors.length)];
+function getColorForScaleY(scaleY) {
+    if (scaleY === 0.5) {
+        return 0xD5533F; // Red
+    } else if (scaleY >= 1 && scaleY <= 100) {
+        const shadesOfGreen = [
+            0xE6FDDA, // Light green
+            0x9FCC87, 
+            0x699452, 
+            0x4C7636, 
+            0x396025, 
+            0x223F13  // Deep green
+        ];
+        // Map scaleY (1-100) to shadesOfGreen (6 groups)
+        const groupIndex = Math.min(Math.floor((scaleY - 1) / (100 / shadesOfGreen.length)), shadesOfGreen.length - 1);
+        return shadesOfGreen[groupIndex];
+    }
+    return 0x999999; // Default gray
 }
+
 
 function buildPackageHierarchy(grounds) {
     // Root of hierarchy
@@ -319,7 +301,7 @@ function applyTreemapLayout(rootNode, grounds) {
     const totalArea = grounds.reduce((sum, ground) => sum + ground.scaleX * ground.scaleZ, 0);
 
     // Set a scaling factor to determine compactness; adjust as needed
-    const scalingFactor = 10;
+    const scalingFactor = 1;
 
     // Calculate the side length of the layout area dynamically
     const sideLength = Math.sqrt(totalArea) * scalingFactor;
